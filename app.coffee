@@ -29,5 +29,12 @@ app.configure 'development', ->
 app.get '/', routes.index
 app.all '/register', user.register
 
+# This MUST come last!
+handle404 = (req, res) ->
+  res.statusCode = 404
+  res.render 404, {title:"Not Found"}
+
+app.use handle404
+
 http.createServer(app).listen app.get('port'), ->
   console.log("Express server listening on port " + app.get('port'))
