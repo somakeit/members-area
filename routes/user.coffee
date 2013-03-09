@@ -1,13 +1,13 @@
 User = require '../models/user'
 
-exports.auth = (req, res, next) ->
+exports.auth = (req, response, next) ->
   if req.session.userId? or req.path is '/register'
     return next()
   render = (opts = {}) ->
     opts.err ?= null
     opts.data ?= {}
     opts.title = "Login"
-    res.render 'login', opts
+    response.render 'login', opts
   if req.method is 'POST' and req.body.form is 'login' and req.body.username?
     # Check data
     {username, password} = req.body
@@ -22,12 +22,12 @@ exports.auth = (req, res, next) ->
     return
   return render()
 
-exports.register = (req, res) ->
+exports.register = (req, response) ->
   render = (opts = {}) ->
     opts.err ?= null
     opts.data ?= {}
     opts.title = "Register"
-    res.render 'register', opts
+    response.render 'register', opts
   if req.method is 'POST' and req.body.form is 'register'
     error = new Error()
     unless /^[^@]+@[^@]+.[^@]+$/.test req.body.email
@@ -57,7 +57,7 @@ exports.register = (req, res) ->
         }
       }
       r.success (user) ->
-        res.render 'registrationComplete', {title:"Registration complete", email: req.body.email}
+        response.render 'registrationComplete', {title:"Registration complete", email: req.body.email}
       r.error (err) ->
         console.error "Error registering user:"
         console.error err
