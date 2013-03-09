@@ -28,6 +28,7 @@ app.configure 'development', ->
 
 app.get '/', routes.index
 app.all '/register', user.register
+app.all '/verify', user.verify
 
 # This MUST come last!
 handle404 = (req, res) ->

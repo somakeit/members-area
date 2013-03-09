@@ -24,7 +24,6 @@ block content
           a(href="http://www.legislation.gov.uk/ukpga/2006/46/part/8/chapter/2/crossheading/general") UK law
           |  requires that you provide your real name and address in order to join.
         |  Your name will be visible to all members.
-        |  Your password will be auto-generated and emailed to you - don't forget to check your spam folder!
   .row
     .span6.offset3.register-form
       h2 Join
@@ -47,9 +46,18 @@ block content
             label(class="text-"+controlGroupClass) Address
             textarea.text(name='address', placeholder='Required', rows=4)= data.address
 
+          - controlGroupClass = (err && err.password ? "error" : "")
+          .control-group(class=controlGroupClass)
+            label(class="text-"+controlGroupClass) Password
+            input.text(type='password', name='password', placeholder='Password')
+            input.text(type='password', name='password2', placeholder='Again')
+
+            if err && err.passwordsdontmatch
+              p.text-error Passwords don't match.
+
           - controlGroupClass = (err && err.wikiname ? "error" : "")
           .control-group(class=controlGroupClass)
-            label(class="text-"+controlGroupClass) Wiki Username
+            label(class="text-"+controlGroupClass) Wiki Username (if you have one)
             input.text(type='text', name='wikiname', placeholder='Optional', value=data.wikiname)
 
           - controlGroupClass = (err && err.terms ? "error" : "")
