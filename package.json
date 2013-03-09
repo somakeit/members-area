@@ -10,6 +10,7 @@
     "jade": "~0.28.2",
     "stylus": "~0.32.1",
     "coffee-script": "~1.6.1",
-    "sequelize": "~1.6.0-beta4"
+    "sequelize": "~1.6.0-beta4",
+    "nodemailer": "~0.3.43"
   }
 }

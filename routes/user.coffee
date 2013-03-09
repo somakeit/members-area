@@ -1,4 +1,13 @@
 User = require '../models/user'
+nodemailer = require 'nodemailer'
+
+gmail = nodemailer.createTransport "SMTP", {
+  service: "Gmail",
+  auth: {
+    user: process.env.EMAIL_USERNAME
+    pass: process.env.EMAIL_PASSWORD
+  }
+}
 
 exports.auth = (req, response, next) ->
   if req.session.userId? or req.path is '/register'
@@ -30,7 +39,7 @@ exports.register = (req, response) ->
     response.render 'register', opts
   if req.method is 'POST' and req.body.form is 'register'
     error = new Error()
-    unless /^[^@]+@[^@]+.[^@]+$/.test req.body.email
+    unless /^[^@\s,"]+@[^@\s,]+\.[^@\s,]+$/.test req.body.email
       error.email = true
     unless /.+ .*/.test req.body.fullname
       error.fullname = true
@@ -57,7 +66,26 @@ exports.register = (req, response) ->
         }
       }
       r.success (user) ->
-        response.render 'registrationComplete', {title:"Registration complete", email: req.body.email}
+        # Send them the email
+        verifyURL = "http://members.somakeit.org.uk/verify?id=#{user.id}&validationCode=#{validationCode}"
+        gmail.sendMail {
+          from: "So Make It <web@somakeit.org.uk>"
+          to: req.body.email
+          subject: "SoMakeIt: verify your email address"
+          body: """
+            Thanks for registering! Please verify your email address by clicking the link below:
+
+            #{verifyURL}
+
+            Thanks,
+
+            The So Make It web team
+            """
+        }, (err, res) ->
+          if err
+            console.error "Error sending registration email."
+            console.error err
+          response.render 'registrationComplete', {title:"Registration complete", email: req.body.email, err: err}
       r.error (err) ->
         console.error "Error registering user:"
         console.error err
