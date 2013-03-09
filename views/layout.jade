@@ -2,12 +2,15 @@ doctype 5
 html
   head
     title= title
+      |  | So Make It Members
     meta(name="viewport", content="width=device-width, initial-scale=1.0")
     link(rel='stylesheet', href='http://www.somakeit.org.uk/css/bootstrap.min.css')
     link(rel='stylesheet', href='http://www.somakeit.org.uk/css/bootstrap-responsive.min.css')
     link(rel='stylesheet', href='http://www.somakeit.org.uk/css/style.css')
     link(rel='stylesheet', href='/css/style.css')
     link(href="/img/favicon.png", rel="shortcut icon")
+    script(src='http://code.jquery.com/jquery-1.9.1.min.js')
+    script(src='http://code.jquery.com/jquery-migrate-1.1.1.min.js')
     script(src='http://www.somakeit.org.uk/js/bootstrap.min.js')
   body
     .navbar.navbar-inverse.navbar-static-top
@@ -31,9 +34,10 @@ html
                 a(href='http://www.somakeit.org.uk/contact/') Contact
               li
                 a(href='http://wiki.somakeit.org.uk/') Wiki
-              li.right.active
+            ul.nav.pull-right
+              li.active
                 a(href='http://members.somakeit.org.uk/') Members area
-    .container.content
+    #main.container
       block content
 
     .container
