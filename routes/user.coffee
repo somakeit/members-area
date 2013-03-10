@@ -240,15 +240,15 @@ exports.register = (req, response) ->
     response.render 'register', opts
   if req.method is 'POST' and req.body.form is 'register'
     error = new Error()
-    unless /^[^@\s,"]+@[^@\s,]+\.[^@\s,]+$/.test req.body.email
+    unless /^[^@\s,"]+@[^@\s,]+\.[^@\s,]+$/.test req.body.email ? ""
       error.email = true
-    unless /.+ .*/.test req.body.fullname
+    unless /.+ .*/.test req.body.fullname ? ""
       error.fullname = true
-    unless req.body.address.length > 8
+    unless req.body.address?.length > 8
       error.address = true
     unless req.body.terms is 'on'
       error.terms = true
-    unless req.body.password.length >= 6
+    unless req.body.password?.length >= 6
       error.password = true
     unless req.body.password is req.body.password2
       error.password = true
