@@ -89,7 +89,32 @@ exports.verify = (req, response) ->
           console.error err
           response.render 'message', {title: "Database issue", text: "Please try again later."}
         r.success ->
-          success()
+          if user.approved?
+            # XXX: email old address to tell them it has been replaced
+            success()
+          else
+            approveURL = "http://members.somakeit.org.uk/user/#{user.id}"
+            gmail.sendMail {
+              from: "So Make It <web@somakeit.org.uk>"
+              to: process.env.APPROVAL_TEAM_EMAIL
+              subject: "SoMakeIt[Registration]: #{user.fullname} (#{user.email})"
+              body: """
+                New registration:
+
+                  Email: #{user.email}
+                  Name: #{user.fullname}
+                  Address: #{("\n"+user.address).replace(/\n/g, "\n    ")}
+                  Wikiname: #{user.wikiname}
+
+                Approve or reject them here:
+                #{approveURL}
+
+                Thanks,
+
+                The So Make It web team
+                """
+            }, (err, res) ->
+              success()
       else
         fail()
 
