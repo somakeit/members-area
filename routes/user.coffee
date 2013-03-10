@@ -10,8 +10,15 @@ gmail = nodemailer.createTransport "SMTP", {
   }
 }
 
+generateValidationCode = ->
+  letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+  code = ""
+  for i in [0..7]
+    code += letters[Math.floor Math.random()*letters.length]
+  return code
+
 exports.auth = (req, response, next) ->
-  if req.session.userId? or ['/register', '/verify'].indexOf(req.path) isnt -1
+  if req.session.userId? or ['/register', '/verify', '/forgot'].indexOf(req.path) isnt -1
     return next()
   render = (opts = {}) ->
     opts.err ?= null
@@ -63,7 +70,7 @@ exports.verify = (req, response) ->
     fail()
   else
     r = User.find(id)
-    r.fail (err) ->
+    r.error (err) ->
       fail()
     r.success (user) ->
       if !user
@@ -118,6 +125,113 @@ exports.verify = (req, response) ->
       else
         fail()
 
+exports.forgot = (req, response) ->
+  render = (opts = {}) ->
+    opts.err ?= null
+    opts.data ?= {}
+    opts.title = "Forgot Password"
+    response.render 'forgot', opts
+  success = ->
+    response.render 'message', {title:"Success", text: "Password reset."}
+  sent = ->
+    response.render 'message', {title:"Password Reset Sent", text: "Please check your email for your reset code."}
+  if req.method isnt 'POST'
+    if req.query.id
+      render({password:true})
+    else
+      render()
+  else
+    unless req.body.email? or req.query.id?
+      return render()
+    if req.query.id?
+      id = parseInt(req.query.id, 10)
+      r = User.find(id)
+      r.error (err) ->
+        response.render 'message', {title:"Error", text: "Unknown error occurred, please try again later."}
+      r.success (user) ->
+        if !user
+          response.render 'message', {title:"Error", text: "User not found"}
+          return
+        data = {}
+        try
+          data = JSON.parse user.data
+        if data.resetCode isnt req.query.validationCode or !data.resetCode or (data.passwordResetRequested ? 0) < (new Date().getTime() - 24*60*60*1000)
+          response.render 'message', {title:"Denied", text: "Password reset expired."}
+          return
+        error = new Error()
+        unless req.body.password?.length >= 6
+          error.password = true
+        unless req.body.password is req.body.password2
+          error.password = true
+          error.passwordsdontmatch = true
+        if error.password
+          render({password:true, err})
+          return
+        delete data.resetCode
+        delete data.passwordResetRequested
+        user.data = JSON.stringify data
+        bcrypt.hash req.body.password, 10, (err, hash) ->
+          if err or !hash
+            response.render 'message', {title:"error", text: "unknown error occurred, please try again later."}
+            return
+          user.password = hash
+          r = user.save()
+          r.error (err) ->
+            response.render 'message', {title:"error", text: "unknown error occurred, please try again later."}
+          r.success ->
+            success()
+
+    else if req.body.email?
+      r = User.find(where:{email:req.body.email})
+      r.error (err) ->
+        return render({data:req.body,err})
+      r.success (user) ->
+        if !user
+          gmail.sendMail {
+            from: "So Make It <web@somakeit.org.uk>"
+            to: req.body.email
+            subject: "So Make It reset"
+            body: """
+              Someone (hopefully you) attempted to reset the password for this
+              account, however we don't have an account at this email address -
+              sorry about that. Do you have any other addresses you may have
+              used?
+
+              Cheers,
+
+              The So Make It web team.
+              """
+            }, (err, res) ->
+              sent()
+        else
+          validationCode = generateValidationCode()
+          data = {}
+          try
+            data = JSON.parse user.data
+          data.resetCode = validationCode
+          data.passwordResetRequested = new Date().getTime()
+          user.data = JSON.stringify data
+          r = user.save()
+          r.error (err) ->
+
+          verifyURL = "http://members.somakeit.org.uk/forgot?id=#{user.id}&validationCode=#{validationCode}"
+          r.success ->
+            gmail.sendMail {
+              from: "So Make It <web@somakeit.org.uk>"
+              to: req.body.email
+              subject: "So Make It password reset"
+              body: """
+                Please click the link below to reset your password:
+
+                #{verifyURL}
+
+                Cheers,
+
+                The So Make It web team.
+                """
+              }, (err, res) ->
+                sent()
+
 exports.register = (req, response) ->
   render = (opts = {}) ->
     opts.err ?= null
@@ -143,10 +257,7 @@ exports.register = (req, response) ->
       render(err:error, data: req.body)
     else
       # Attempt registration
-      letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-      validationCode = ""
-      for i in [0..7]
-        validationCode += letters[Math.floor Math.random()*letters.length]
+      validationCode = generateValidationCode()
       bcrypt.hash req.body.password, 10, (err, hash) ->
         if err
           return fail()

@@ -1,0 +1,27 @@
+extends layout
+
+block content
+  .row
+    .span4.offset4.register-form
+      h2 Reset password
+      form(action='', method='POST')
+        fieldset
+          if typeof password != 'undefined'
+
+            - controlGroupClass = (err && err.password ? "error" : "")
+            .control-group(class=controlGroupClass)
+              label(class="text-"+controlGroupClass) New password
+              input.text(type='password', name='password', placeholder='Password')
+              input.text(type='password', name='password2', placeholder='Again')
+
+              if err && err.passwordsdontmatch
+                p.text-error Passwords don't match.
+
+          else
+            - var controlGroupClass = (!!err ? "error" : "")
+            .control-group(class=controlGroupClass)
+              input(type='hidden', name='form', value='login')
+              .clearfix
+                - var email = data.email || ""
+                input.text(type='text', name='email', placeholder='Email', value=email)
+          button.btn.btn-primary.btn-large(type='submit') Reset password
