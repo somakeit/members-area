@@ -8,15 +8,14 @@ try
     process.env[matches[1]] ?= matches[2]
 
 requiredEnvironmentalVars = [
-  'MYSQL_HOST'
-  'MYSQL_DATABASE'
-  'MYSQL_USERNAME'
-  'MYSQL_PASSWORD'
   'SECRET'
   'EMAIL_USERNAME'
   'EMAIL_PASSWORD'
   'APPROVAL_TEAM_EMAIL'
 ]
+
+unless process.env.SQLITE
+  requiredEnvironmentalVars.push 'MYSQL_HOST', 'MYSQL_DATABASE', 'MYSQL_USERNAME', 'MYSQL_PASSWORD'
 
 missing = (name for name in requiredEnvironmentalVars when !process.env[name]?)
 if missing.length
