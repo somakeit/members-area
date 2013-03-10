@@ -31,7 +31,22 @@ exports.auth = (req, response, next) ->
         if err or !res
           return render {data:req.body,err:new Error()}
         else
-          response.render 'message', {title:"Logged in", text: "Done..."}
+          if user.approved?
+            response.render 'message', {title:"Logged in", text: "Done..."}
+          else
+            subject = "Pending approval: account ##{user.id}"
+            response.render 'message',
+              title:"Awaiting approval"
+              html:
+                """
+                <p>
+                Our trustees need to enter you onto our Register of Members
+                before your account can be approved. If it's been more than 5
+                days, please contact <a
+                href="mailto:trustees@somakeit.org.uk?subject=#{encodeURIComponent
+                subject}">trustees@somakeit.org.uk</a>.
+                </p>
+                """
     return
   return render()
 

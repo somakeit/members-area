@@ -4,5 +4,8 @@ block content
   .row
     .span4.offset4
       h2= title
-      p= text
+      if typeof html !== 'undefined'
+        .message !{html}
+      if typeof text !== 'undefined'
+        p= text
 
