@@ -13,5 +13,8 @@
     "sequelize": "~1.6.0-beta4",
     "nodemailer": "~0.3.43",
     "bcrypt": "~0.7.4"
+  },
+  "devDependencies": {
+    "sqlite3": "~2.1.5"
   }
 }
