@@ -36,7 +36,7 @@ html
                 a(href='http://wiki.somakeit.org.uk/') Wiki
             ul.nav.pull-right
               li.active
-                a(href='http://members.somakeit.org.uk/') Members area
+                a(href='#{process.env.SERVER_ADDRESS}/') Members area
     #main.container
       block content
 

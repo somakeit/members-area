@@ -214,7 +214,7 @@ exports.forgot = (req, response) ->
           r = user.save()
           r.error (err) ->
 
-          verifyURL = "http://members.somakeit.org.uk/forgot?id=#{user.id}&validationCode=#{validationCode}"
+          verifyURL = "#{process.env.SERVER_ADDRESS}/forgot?id=#{user.id}&validationCode=#{validationCode}"
           r.success ->
             gmail.sendMail {
               from: "So Make It <web@somakeit.org.uk>"
@@ -274,7 +274,7 @@ exports.register = (req, response) ->
         }
         r.success (user) ->
           # Send them the email
-          verifyURL = "http://members.somakeit.org.uk/verify?id=#{user.id}&validationCode=#{validationCode}"
+          verifyURL = "#{process.env.SERVER_ADDRESS}/verify?id=#{user.id}&validationCode=#{validationCode}"
           gmail.sendMail {
             from: "So Make It <web@somakeit.org.uk>"
             to: req.body.email
