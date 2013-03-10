@@ -8,6 +8,10 @@ password = process.env.MYSQL_PASSWORD
 
 sqz = new Sequelize database, username, password, {
   host: host
+
+  dialect: if process.env.SQLITE then 'sqlite' else 'mysql',
+  storage: process.env.SQLITE_PATH || './db.sqlite'
+
   define: {
     charset: 'utf8'
     collate: 'utf8_general_ci'
