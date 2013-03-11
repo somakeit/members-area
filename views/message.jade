@@ -1,11 +1,10 @@
 extends layout
 
 block content
-  .row
-    .span4.offset4
-      h2= title
-      if typeof html !== 'undefined'
-        .message !{html}
-      if typeof text !== 'undefined'
-        p= text
+  .message-container
+    h2= title
+    if typeof html !== 'undefined'
+      .message !{html}
+    if typeof text !== 'undefined'
+      p= text
 
