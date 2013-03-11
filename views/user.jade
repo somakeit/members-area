@@ -3,20 +3,21 @@ extends layout
 block content
   h2 #{user.fullname}
   p Username: #{user.username}
+  if user.wikiname
+    p Wiki account: 
+      a(href="http://wiki.somakeit.org.uk/wiki/User:#{user.wikiname}") #{user.wikiname}
   if admin
     p Email: #{user.email}
     p Address:
       pre #{user.address}
-    if user.wikiname
-      p Wiki username: #{user.wikiname}
-    if user.approved
-      p Approved on: #{user.approved}
-    else
-      form(method="POST").approval
-        input(type='hidden', name='form', value='approval')
-        h3 Approve or reject
-        p Rejection message (it's only polite!):
-        textarea(name='message')
-        br
-        button(name='approve', value='1').btn.btn-success Approve
-        button(name='reject', value='1').btn.btn-danger Reject
+  if user.approved
+    p Member since: #{user.approved}
+  else if admin
+    form(method="POST").approval
+      input(type='hidden', name='form', value='approval')
+      h3 Approve or reject
+      p Rejection message (it's only polite!):
+      textarea(name='message')
+      br
+      button(name='approve', value='1').btn.btn-success Approve
+      button(name='reject', value='1').btn.btn-danger Reject
