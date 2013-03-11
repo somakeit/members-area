@@ -3,13 +3,23 @@ routes = require './routes'
 user = require './routes/user'
 http = require 'http'
 path = require 'path'
+nib = require 'nib'
+stylus = require('stylus')
 
 require './env'
 
 app = express()
 
+stylusCompile = (str, path) ->
+  return stylus(str)
+    .set('filename', path)
+    .set('compress', true)
+    .use(nib())
+
 app.configure ->
-  app.use require('stylus').middleware(path.join(__dirname, 'public'))
+  app.use stylus.middleware
+    src: path.join(__dirname, 'public')
+    compile: stylusCompile
   app.use express.static(path.join(__dirname, 'public'))
   app.set 'port', process.env.PORT ? 1337
   app.set 'views', __dirname + '/views'
