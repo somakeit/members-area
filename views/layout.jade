@@ -38,32 +38,56 @@ html
               li.active
                 a(href='#{process.env.SERVER_ADDRESS}/') Members area
     #main.container
-      if userId
-        .row
-          .span12
-            ul.nav.nav-pills
-              -templates = ['dashboard']
-              li(class=(templates.indexOf(templateName) != -1 ?  'active' : ''))
-                a(href="/") Dashboard
+      block body
+        if userId
+          .row
+            .span3
+              ul.nav.nav-list
+                li.nav-header User #{userId}
 
-              -templates = ['users', 'user']
-              li(class=(templates.indexOf(templateName) != -1 ?  'active' : ''))
-                a(href="/user") Member list
-
-              -templates = ['account']
-              li(class=(templates.indexOf(templateName) != -1 ?  'active' : ''))
-                a(href="/account") Account
-
-              -templates = ['subscription']
-              li(class=(templates.indexOf(templateName) != -1 ?  'active' : ''))
-                a(href="/subscription") Subscription
-
-              if admin
-                -templates = ['admin']
+                -templates = ['dashboard']
                 li(class=(templates.indexOf(templateName) != -1 ?  'active' : ''))
-                  a(href="/admin") Admin
+                  a(href="/") Dashboard
 
-      block content
+                -templates = ['account']
+                li(class=(templates.indexOf(templateName) != -1 ?  'active' : ''))
+                  a(href="/account") Account
+
+                -templates = ['subscription']
+                li(class=(templates.indexOf(templateName) != -1 ?  'active' : ''))
+                  a(href="/subscription") Subscription
+
+                -templates = ['users', 'user']
+                li(class=(templates.indexOf(templateName) != -1 ?  'active' : ''))
+                  a(href="/user") Member list
+
+                if admin
+                  li.nav-header Administration
+                    -templates = ['admin']
+                    li(class=(templates.indexOf(templateName) != -1 ?  'active' : ''))
+                      a(href="/admin") Owt yet
+
+            .span9.main
+              block content
+        else
+          .row
+            .span12
+              block content
+
+    if false
+      li.nav-header Not logged in
+
+      -templates = ['login']
+      li(class=(templates.indexOf(templateName) != -1 ?  'active' : ''))
+        a(href="/") Log in
+
+      -templates = ['register','registrationComplete']
+      li(class=(templates.indexOf(templateName) != -1 ?  'active' : ''))
+        a(href="/register") Register
+
+      -templates = ['forgot']
+      li(class=(templates.indexOf(templateName) != -1 ?  'active' : ''))
+        a(href="/forgot") Forgot password
 
     .container
       footer

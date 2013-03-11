@@ -2,10 +2,15 @@
 
 #main.container
   min-height: 300px
+.gumph
+  font-size: 1.3em
+  line-height: (1.05 * @font-size)
+  margin-top: 50px
+  text-align: justify
 .register-form
 .login-form
   padding:20px
-  margin-top: 50px
+  margin-top: 30px
   margin-bottom: @margin-top
   background-color: #eee
   box-shadow: 0 2px 4px rgba(0,0,0,0.4)
@@ -13,9 +18,19 @@
   button
     display: block
     margin: auto
+  textarea
+    box-sizing: border-box
+    width: 100%
   input.text
     box-sizing: border-box
     width: 100%
     height: 2.2em
 .login-form
   text-align: center
+
+.nav-list
+  background-color: #f5f5f5;
+  border: 1px solid #e3e3e3;
+  border-radius: 4px;
+  margin: 10px
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
