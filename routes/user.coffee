@@ -22,6 +22,7 @@ exports.auth = (req, response, next) ->
   loggedIn = ->
     console.log req.session
     response.locals.userId = req.session?.userId
+    response.locals.fullname = req.session?.fullname
     response.locals.admin = req.session?.admin
     return next()
   if req.session.userId? or ['/register', '/verify', '/forgot'].indexOf(req.path) isnt -1
@@ -46,6 +47,7 @@ exports.auth = (req, response, next) ->
         else
           if user.approved?
             req.session.userId = user.id
+            req.session.fullname = user.fullname
             req.session.admin = user.admin
             return loggedIn()
           else
