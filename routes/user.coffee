@@ -18,8 +18,14 @@ generateValidationCode = ->
   return code
 
 exports.auth = (req, response, next) ->
-  if req.session.userId? or ['/register', '/verify', '/forgot'].indexOf(req.path) isnt -1
+  response.locals.userId = null
+  loggedIn = ->
+    console.log req.session
+    response.locals.userId = req.session?.userId
+    response.locals.admin = req.session?.admin
     return next()
+  if req.session.userId? or ['/register', '/verify', '/forgot'].indexOf(req.path) isnt -1
+    return loggedIn()
   render = (opts = {}) ->
     opts.err ?= null
     opts.data ?= {}
@@ -39,7 +45,9 @@ exports.auth = (req, response, next) ->
           return render {data:req.body,err:new Error()}
         else
           if user.approved?
-            response.render 'message', {title:"Logged in", text: "Done..."}
+            req.session.userId = user.id
+            req.session.admin = user.admin
+            return loggedIn()
           else
             subject = "Pending approval: account ##{user.id}"
             response.render 'message',
@@ -126,6 +134,9 @@ exports.verify = (req, response) ->
         fail()
 
 exports.forgot = (req, response) ->
+  if req.session?.userId
+    response.redirect "/"
+    return
   render = (opts = {}) ->
     opts.err ?= null
     opts.data ?= {}
@@ -233,6 +244,9 @@ exports.forgot = (req, response) ->
                 sent()
 
 exports.register = (req, response) ->
+  if req.session?.userId
+    response.redirect "/"
+    return
   render = (opts = {}) ->
     opts.err ?= null
     opts.data ?= {}

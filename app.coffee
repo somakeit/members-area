@@ -1,6 +1,6 @@
 express = require 'express'
-routes = require './routes'
 user = require './routes/user'
+dashboard = require './routes/dashboard'
 http = require 'http'
 path = require 'path'
 nib = require 'nib'
@@ -44,7 +44,7 @@ app.configure ->
 app.configure 'development', ->
   app.use express.errorHandler()
 
-app.get '/', routes.index
+app.all '/', dashboard.index
 app.all '/register', user.register
 app.all '/verify', user.verify
 app.all '/forgot', user.forgot

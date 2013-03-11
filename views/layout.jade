@@ -38,6 +38,31 @@ html
               li.active
                 a(href='#{process.env.SERVER_ADDRESS}/') Members area
     #main.container
+      if userId
+        .row
+          .span12
+            ul.nav.nav-pills
+              -templates = ['dashboard']
+              li(class=(templates.indexOf(templateName) != -1 ?  'active' : ''))
+                a(href="/") Dashboard
+
+              -templates = ['users', 'user']
+              li(class=(templates.indexOf(templateName) != -1 ?  'active' : ''))
+                a(href="/user") Member list
+
+              -templates = ['account']
+              li(class=(templates.indexOf(templateName) != -1 ?  'active' : ''))
+                a(href="/account") Account
+
+              -templates = ['subscription']
+              li(class=(templates.indexOf(templateName) != -1 ?  'active' : ''))
+                a(href="/subscription") Subscription
+
+              if admin
+                -templates = ['admin']
+                li(class=(templates.indexOf(templateName) != -1 ?  'active' : ''))
+                  a(href="/admin") Admin
+
       block content
 
     .container
