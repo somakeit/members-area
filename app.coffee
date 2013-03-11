@@ -51,6 +51,7 @@ app.all '/forgot', user.forgot
 
 # Logged in
 app.all '/', dashboard.index
+app.all '/user', user.list
 app.all '/user/:userId', user.view
 
 # This MUST come last!

@@ -1,0 +1,11 @@
+extends layout
+
+block content
+  h2 User list
+  ul
+    each user in users
+      li
+        if user.approved
+          a(href="/user/#{user.id}") #{user.fullname} (#{user.username})
+        else
+          a(href="/user/#{user.id}") #{user.fullname} (#{user.username}) (pending)

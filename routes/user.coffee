@@ -28,6 +28,16 @@ disallowedUsernameRegexps = [
   /^(admin|join|social|info|queries)$/i
 ]
 
+exports.list = (req, response, next) ->
+  query = "approved IS NOT NULL"
+  if req.session.admin
+    query = ""
+  r = User.findAll(query)
+  r.error (err) ->
+    response.render 'message', {title:"Error", text: "Unknown error occurred, please try again later."}
+  r.success (users) ->
+    response.render 'users', {title: "User list", users:users}
+
 exports.view = (req, response, next) ->
   id = req.params.userId
   r = User.find(id)
