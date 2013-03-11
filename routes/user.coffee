@@ -17,6 +17,17 @@ generateValidationCode = ->
     code += letters[Math.floor Math.random()*letters.length]
   return code
 
+disallowedUsernameRegexps = [
+  /master$/i
+  /^admin/i
+  /admin$/i
+  /^(southackton|soha|somakeit|smi)$/i
+  /^trust/i
+  /^director/i
+  /^(root|daemon|bin|sys|sync|backup|games|man|lp|mail|news|proxy|www-data|apache|apache2|irc|nobody|syslog|sshd|ubuntu|mysql|logcheck|redis)$/i
+  /^(admin|join|social|info|queries)$/i
+]
+
 exports.auth = (req, response, next) ->
   response.locals.userId = null
   loggedIn = ->
@@ -262,8 +273,11 @@ exports.register = (req, response) ->
       error.email = true
     unless /.+ .*/.test req.body.fullname ? ""
       error.fullname = true
-    unless /^[a-z][a-z0-9]{2,}$/i.test req.body.username ? ""
+    unless /^[a-z][a-z0-9]{2,13}$/i.test req.body.username ? ""
       error.username = true
+    for regexp in disallowedUsernameRegexps when regexp.test req.body.username
+      error.username = true
+      error.username403 = true
     unless req.body.address?.length > 8
       error.address = true
     unless req.body.terms is 'on'
@@ -273,7 +287,7 @@ exports.register = (req, response) ->
     unless req.body.password is req.body.password2
       error.password = true
       error.passwordsdontmatch = true
-    if error.email or error.fullname or error.address or error.terms or error.password
+    if error.email or error.fullname or error.address or error.terms or error.password or error.username
       render(err:error, data: req.body)
     else
       # Attempt registration

@@ -50,6 +50,8 @@ block body
                 p.text-error This email address is already registered.
               if item == 'username' && err && err.username409
                 p.text-error This username has been taken by another user.
+              if item == 'username' && err && err.username403
+                p.text-error This username is disallowed.
 
           - controlGroupClass = (err && err.address ? "error" : "")
           .control-group(class=controlGroupClass)
