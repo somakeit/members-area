@@ -13,6 +13,7 @@ requiredEnvironmentalVars = [
   'EMAIL_PASSWORD'
   'APPROVAL_TEAM_EMAIL'
   'SERVER_ADDRESS'
+  'TRUSTEES_ADDRESS'
 ]
 
 unless process.env.SQLITE

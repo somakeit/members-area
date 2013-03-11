@@ -43,7 +43,7 @@ exports.view = (req, response, next) ->
         gmail.sendMail {
           from: "So Make It <web@somakeit.org.uk>"
           to: user.email
-          bcc: "web@somakeit.org.uk"
+          bcc: "#{process.env.TRUSTEES_ADDRESS}"
           subject: "So Make It application"
           text: """
             Hello #{user.fullname},
@@ -76,7 +76,7 @@ exports.view = (req, response, next) ->
         gmail.sendMail {
           from: "So Make It <web@somakeit.org.uk>"
           to: user.email
-          bcc: "trustees@somakeit.org.uk"
+          bcc: "#{process.env.TRUSTEES_ADDRESS}"
           subject: "So Make It approval"
           text: """
             Hello #{user.fullname} (#{user.username}),
@@ -154,8 +154,8 @@ exports.auth = (req, response, next) ->
                 Our trustees need to enter you onto our Register of Members
                 before your account can be approved. If it's been more than 5
                 days, please contact <a
-                href="mailto:trustees@somakeit.org.uk?subject=#{encodeURIComponent
-                subject}">trustees@somakeit.org.uk</a>.
+                href="mailto:#{process.env.TRUSTEES_ADDRESS}?subject=#{encodeURIComponent
+                subject}">#{process.env.TRUSTEES_ADDRESS}</a>.
                 </p>
                 """
     return
