@@ -122,7 +122,7 @@ exports.verify = (req, response) ->
             # XXX: email old address to tell them it has been replaced
             success()
           else
-            approveURL = "http://members.somakeit.org.uk/user/#{user.id}"
+            approveURL = "#{process.env.SERVER_ADDRESS}/user/#{user.id}"
             gmail.sendMail {
               from: "So Make It <web@somakeit.org.uk>"
               to: process.env.APPROVAL_TEAM_EMAIL
