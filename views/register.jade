@@ -26,13 +26,20 @@ block body
           |  requires that you provide your real name and address in order to join.
         |  Your name will be visible to all members.
 
+      p Many of the services provided by So Make It require a username and
+        | password, so you will need to choose a unique username.
+
     .span4.offset2.register-form
       h2 Registration form
       form(action='', method='POST')
         fieldset
           input(type='hidden', name='form', value='register')
 
-          - each field in ['Email', 'Full Name']
+          p
+            strong
+              a(href="http://www.legislation.gov.uk/ukpga/2006/46/part/8/chapter/2/crossheading/general") UK law
+              |  requires that you provide your real name and address in order to join.
+          - each field in ['Full Name', 'Email', 'Username']
             - item = field.replace(/ /,"").toLowerCase()
             - controlGroupClass = (err && err[item] ? "error" : "")
             .control-group(class=controlGroupClass)
@@ -41,6 +48,8 @@ block body
 
               if item == 'email' && err && err.email409
                 p.text-error This email address is already registered.
+              if item == 'username' && err && err.username409
+                p.text-error This username has been taken by another user.
 
           - controlGroupClass = (err && err.address ? "error" : "")
           .control-group(class=controlGroupClass)

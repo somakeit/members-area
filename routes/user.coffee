@@ -48,6 +48,7 @@ exports.auth = (req, response, next) ->
           if user.approved?
             req.session.userId = user.id
             req.session.fullname = user.fullname
+            req.session.username = user.username
             req.session.admin = user.admin
             return loggedIn()
           else
@@ -119,6 +120,7 @@ exports.verify = (req, response) ->
                 New registration:
 
                   Email: #{user.email}
+                  Username: #{user.username}
                   Name: #{user.fullname}
                   Address: #{("\n"+user.address).replace(/\n/g, "\n    ")}
                   Wikiname: #{user.wikiname}
@@ -260,6 +262,8 @@ exports.register = (req, response) ->
       error.email = true
     unless /.+ .*/.test req.body.fullname ? ""
       error.fullname = true
+    unless /^[a-z][a-z0-9]{2,}$/i.test req.body.username ? ""
+      error.username = true
     unless req.body.address?.length > 8
       error.address = true
     unless req.body.terms is 'on'
@@ -279,6 +283,7 @@ exports.register = (req, response) ->
           return fail()
         r = User.create {
           email: req.body.email
+          username: req.body.username
           password: hash
           fullname: req.body.fullname
           address: req.body.address
@@ -296,6 +301,8 @@ exports.register = (req, response) ->
             to: req.body.email
             subject: "SoMakeIt: verify your email address"
             body: """
+              Hi #{req.body.fullname},
+
               Thanks for registering! Please verify your email address by clicking the link below:
 
               #{verifyURL}
@@ -313,8 +320,12 @@ exports.register = (req, response) ->
           console.error "Error registering user:"
           console.error err
           if err.code is 'ER_DUP_ENTRY'
-            err.email = true
-            err.email409 = true
+            if err.message.match /'email'/
+              err.email = true
+              err.email409 = true
+            else
+              err.username = true
+              err.username409 = true
           else
             err.unknown = true
           render(err: err, data: req.body)
