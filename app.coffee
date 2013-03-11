@@ -17,6 +17,14 @@ stylusCompile = (str, path) ->
     .use(nib())
 
 app.configure ->
+  # Export the template name to templates
+  app.use (req, res, next) ->
+    render = res.render
+    res.render = (templateName) ->
+      res.locals.templateName = templateName
+      return render.apply this, arguments
+    next()
+
   app.use stylus.middleware
     src: path.join(__dirname, 'public')
     compile: stylusCompile
