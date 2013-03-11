@@ -11,7 +11,7 @@ block body
             input(type='hidden', name='form', value='login')
             .clearfix
               - var email = data.email || ""
-              input.text(type='text', name='email', placeholder='Email', value=email)
+              input.text(type='text', name='email', placeholder='Username or email', value=email)
             .clearfix
               input.text(type='password', name='password', placeholder='Password')
           if err

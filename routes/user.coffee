@@ -46,7 +46,11 @@ exports.auth = (req, response, next) ->
   if req.method is 'POST' and req.body.form is 'login' and req.body.email?
     # Check data
     {email, password} = req.body
-    r = User.find(where:{email:email})
+    if email.match /@/
+      query = where:{email:email}
+    else
+      query = where:{username:email}
+    r = User.find(query)
     r.error (err) ->
       return render({data:req.body,err})
     r.success (user) ->
