@@ -28,6 +28,84 @@ disallowedUsernameRegexps = [
   /^(admin|join|social|info|queries)$/i
 ]
 
+exports.view = (req, response, next) ->
+  id = req.params.userId
+  r = User.find(id)
+  r.error (err) ->
+    response.render 'message', {title: "Error", text:"DB issue?"}
+  r.success (user) ->
+    render = ->
+      if !user
+        return next()
+      response.render 'user', {title: user.fullname, user:user}
+    if req.method is 'POST' and req.session.admin and req.body.form is 'approval'
+      if req.body.reject is '1'
+        gmail.sendMail {
+          from: "So Make It <web@somakeit.org.uk>"
+          to: user.email
+          bcc: "web@somakeit.org.uk"
+          subject: "So Make It application"
+          text: """
+            Hello #{user.fullname},
+
+            Sorry to have to inform you that your application to join So Make It has been rejected.
+
+            The person who reviewed your application was #{req.session.fullname}, and they gave the following reasons:
+
+            ---
+            #{req.body.message}
+            ---
+
+            Your account has been deleted from our server - please reapply once you've fixed the issues stated above.
+
+            Kind regards,
+
+            The So Make It web team.
+            """
+          }, (err, res) ->
+            if err
+              response.render 'message', {title: "Error", text: "Error sending email: #{err}"}
+              return
+            r = user.destroy()
+            r.success ->
+              user = null
+              response.render 'message', {title: "User rejected", text: "Entry deleted from DB."}
+            r.error (err) ->
+              response.render 'message', {title: "Error", text: "Failed to delete user #{user.id} from the DB."}
+      else if req.body.approve is '1'
+        gmail.sendMail {
+          from: "So Make It <web@somakeit.org.uk>"
+          to: user.email
+          bcc: "trustees@somakeit.org.uk"
+          subject: "So Make It approval"
+          text: """
+            Hello #{user.fullname} (#{user.username}),
+
+            We're happy to inform you that your application to join So Make It was approved by #{req.session.fullname} and you are now on our Register of Members!
+
+            Welcome! Why not read more about the makerspace on our wiki?
+
+            http://wiki.somakeit.org.uk/
+
+            Kind regards,
+
+            The So Make It web team.
+            """
+          }, (err, res) ->
+            if err
+              response.render 'message', {title: "Error", text: "Error sending email: #{err}"}
+              return
+            user.approved = new Date()
+            r = user.save()
+            r.success ->
+              render()
+            r.error (err) ->
+              response.render 'message', {title: "Error", text: "Failed to save user #{user.id} to the DB."}
+      else
+        render()
+    else
+      render()
+
 exports.auth = (req, response, next) ->
   response.locals.userId = null
   loggedIn = ->
@@ -138,7 +216,7 @@ exports.verify = (req, response) ->
                   Username: #{user.username}
                   Name: #{user.fullname}
                   Address: #{("\n"+user.address).replace(/\n/g, "\n    ")}
-                  Wikiname: #{user.wikiname}
+                  Wiki: #{if user.wikiname then "http://wiki.somakeit.org.uk/wiki/User:#{user.wikiname}" else "nope"}
 
                 Approve or reject them here:
                 #{approveURL}

@@ -44,10 +44,14 @@ app.configure ->
 app.configure 'development', ->
   app.use express.errorHandler()
 
-app.all '/', dashboard.index
+# Logged out
 app.all '/register', user.register
 app.all '/verify', user.verify
 app.all '/forgot', user.forgot
+
+# Logged in
+app.all '/', dashboard.index
+app.all '/user/:userId', user.view
 
 # This MUST come last!
 handle404 = (req, res) ->
