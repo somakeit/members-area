@@ -17,5 +17,9 @@
   },
   "devDependencies": {
     "sqlite3": "~2.1.5"
+  },
+  "engines": {
+    "node":"0.8.x",
+    "npm":"1.1.x"
   }
 }
