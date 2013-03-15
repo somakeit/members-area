@@ -5,6 +5,8 @@ http = require 'http'
 path = require 'path'
 nib = require 'nib'
 stylus = require('stylus')
+fs = require 'fs'
+net = require 'net'
 
 require './env'
 
@@ -61,5 +63,32 @@ handle404 = (req, res) ->
 
 app.use handle404
 
-http.createServer(app).listen app.get('port'), ->
-  console.log("Express server listening on port " + app.get('port'))
+listen = (port) ->
+  http.createServer(app).listen port, ->
+    if typeof port is 'string'
+      fs.chmod port, '0666'
+    console.log "Express server listening on port " + port
+
+port = app.get('port')
+if typeof port is 'string'
+  # Unix socket - see if it's in use
+  socket = new net.Socket
+  socket.on 'connect', ->
+    console.error "Socket in use"
+    process.exit 1
+  socket.on 'error', (err) ->
+    if err?.code is 'ECONNREFUSED'
+      # No-one's listening
+      fs.unlink port, (err) ->
+        if err
+          console.error "Couldn't delete old socket."
+          process.exit 1
+        console.log "Liberated unused socket."
+        listen port
+    else
+      console.error "Socket '#{port}' in use? #{err}"
+      process.exit 1
+  socket.connect port
+else
+  # TCP socket
+  listen port
