@@ -67,10 +67,10 @@ block body
             if err && err.passwordsdontmatch
               p.text-error Passwords don't match.
 
-          - controlGroupClass = (err && err.wikiname ? "error" : "")
-          .control-group(class=controlGroupClass)
-            label(class="text-"+controlGroupClass) Wiki Username (if you have one)
-            input.text(type='text', name='wikiname', placeholder='Optional', value=data.wikiname, tabindex=tabIndex++)
+          //-- controlGroupClass = (err && err.wikiname ? "error" : "")
+          //-.control-group(class=controlGroupClass)
+            //-label(class="text-"+controlGroupClass) Wiki Username (if you have one)
+            //-input.text(type='text', name='wikiname', placeholder='Optional', value=data.wikiname, tabindex=tabIndex++)
 
           - controlGroupClass = (err && err.terms ? "error" : "")
           .control-group(class=controlGroupClass)
