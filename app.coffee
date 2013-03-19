@@ -20,6 +20,7 @@ stylusCompile = (str, path) ->
 
 app.configure ->
   # Export the template name to templates
+  app.locals.requiredVotes = process.env.REQUIRED_VOTES
   app.use (req, res, next) ->
     render = res.render
     res.render = (templateName) ->

@@ -8,6 +8,7 @@ try
     process.env[matches[1]] ?= matches[2]
 
 requiredEnvironmentalVars = [
+  'REQUIRED_VOTES'
   'SECRET'
   'EMAIL_USERNAME'
   'EMAIL_PASSWORD'

@@ -19,5 +19,9 @@ block content
       p Rejection message (it's only polite!):
       textarea(name='message')
       br
-      button(name='approve', value='1').btn.btn-success Approve
+      if voted
+        p You've already voted for this user.
+      else
+        button(name='approve', value='1').btn.btn-success Approve 
+          | #{user.data.votes.length}/#{locals.requiredVotes}
       button(name='reject', value='1').btn.btn-danger Reject

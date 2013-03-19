@@ -47,7 +47,14 @@ exports.view = (req, response, next) ->
     render = ->
       if !user
         return next()
-      response.render 'user', {title: user.fullname, user:user}
+      u = user.toJSON()
+      try
+        u.data = JSON.parse u.data
+      catch e
+        u.data = {}
+      u.data.votes ?= []
+      voted = (u.data.votes.indexOf(req.session.userId) isnt -1)
+      response.render 'user', {title: user.fullname, user:u, voted: voted}
     if req.method is 'POST' and req.session.admin and req.body.form is 'approval'
       if req.body.reject is '1'
         gmail.sendMail {
@@ -83,34 +90,50 @@ exports.view = (req, response, next) ->
             r.error (err) ->
               response.render 'message', {title: "Error", text: "Failed to delete user #{user.id} from the DB."}
       else if req.body.approve is '1'
-        gmail.sendMail {
-          from: "So Make It <web@somakeit.org.uk>"
-          to: user.email
-          bcc: "#{process.env.TRUSTEES_ADDRESS}"
-          subject: "So Make It approval"
-          text: """
-            Hello #{user.fullname} (#{user.username}),
+        data = {}
+        try
+          data = JSON.parse user.data
+        data.votes ?= []
+        if data.votes.indexOf(req.session.userId) is -1
+          data.votes.push req.session.userId
+        if data.votes.length < app.locals.requiredVotes
+          r = user.save()
+          r.success ->
+            render()
+          r.error (err) ->
+            response.render 'message', {title: "Error", text: "Failed to save user #{user.id} to the DB."}
+        else
+          # Approve
+          gmail.sendMail {
+            from: "So Make It <web@somakeit.org.uk>"
+            to: user.email
+            bcc: "#{process.env.TRUSTEES_ADDRESS}"
+            subject: "So Make It approval"
+            text: """
+              Hello #{user.fullname} (#{user.username}),
 
-            We're happy to inform you that your application to join So Make It was approved by #{req.session.fullname} and you are now on our Register of Members!
+              We're happy to inform you that your application to join So Make It was approved by #{req.session.fullname} and you are now on our Register of Members!
 
-            Welcome! Why not read more about the makerspace on our wiki?
+              Welcome! Why not read more about the makerspace on our wiki?
 
-            http://wiki.somakeit.org.uk/
+              http://wiki.somakeit.org.uk/
 
-            Kind regards,
+              Kind regards,
 
-            The So Make It web team.
-            """
-          }, (err, res) ->
-            if err
-              response.render 'message', {title: "Error", text: "Error sending email: #{err}"}
-              return
-            user.approved = new Date()
-            r = user.save()
-            r.success ->
-              render()
-            r.error (err) ->
-              response.render 'message', {title: "Error", text: "Failed to save user #{user.id} to the DB."}
+              The So Make It web team.
+              """
+            }, (err, res) ->
+              if err
+                response.render 'message', {title: "Error", text: "Error sending email: #{err}"}
+                return
+              delete data.votes
+              user.data = JSON.stringify data
+              user.approved = new Date()
+              r = user.save()
+              r.success ->
+                render()
+              r.error (err) ->
+                response.render 'message', {title: "Error", text: "Failed to save user #{user.id} to the DB."}
       else
         render()
     else
