@@ -1,6 +1,4 @@
 express = require 'express'
-user = require './routes/user'
-dashboard = require './routes/dashboard'
 http = require 'http'
 path = require 'path'
 nib = require 'nib'
@@ -8,9 +6,13 @@ stylus = require('stylus')
 fs = require 'fs'
 net = require 'net'
 
+# Fix/load/check environmental variables
 require './env'
 
 app = express()
+
+user = require('./routes/user')(app)
+dashboard = require('./routes/dashboard')(app)
 
 stylusCompile = (str, path) ->
   return stylus(str)

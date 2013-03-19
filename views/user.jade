@@ -20,7 +20,7 @@ block content
       textarea(name='message')
       br
       if voted
-        p You've already voted for this user.
+        p You've already voted for this user. (Votes: #{user.data.votes.length}/#{locals.requiredVotes})
       else
         button(name='approve', value='1').btn.btn-success Approve 
           | #{user.data.votes.length}/#{locals.requiredVotes}
