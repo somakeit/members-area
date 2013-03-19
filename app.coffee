@@ -13,6 +13,7 @@ app = express()
 
 user = require('./routes/user')(app)
 dashboard = require('./routes/dashboard')(app)
+subscription = require('./routes/subscription')(app)
 
 stylusCompile = (str, path) ->
   return stylus(str)
@@ -58,6 +59,7 @@ app.all '/forgot', user.forgot
 app.all '/', dashboard.index
 app.all '/user', user.list
 app.all '/user/:userId', user.view
+app.all '/subscription', subscription.index
 
 # This MUST come last!
 handle404 = (req, res) ->
