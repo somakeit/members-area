@@ -236,6 +236,9 @@ exports.verify = (req, response) ->
                 The So Make It web team
                 """
             }, (err, res) ->
+              if err
+                console.error "Error sending notification to trustees"
+                console.error err
               success()
       else
         fail()
@@ -320,7 +323,11 @@ exports.forgot = (req, response) ->
               The So Make It web team.
               """
             }, (err, res) ->
-              sent()
+              if err
+                response.render 'message', {title:"Error", text: "Failed to email you a password reset code. Sorry!"}
+                console.error err
+              else
+                sent()
         else
           validationCode = generateValidationCode()
           data = {}
@@ -421,7 +428,9 @@ exports.register = (req, response) ->
             if err
               console.error "Error sending registration email."
               console.error err
-            response.render 'registrationComplete', {title:"Registration complete", email: req.body.email, err: err}
+              response.render 'message', {title:"Error", text: "Failed to email you the email verification code! Email web @ somakeit.org.uk"}
+            else
+              response.render 'registrationComplete', {title:"Registration complete", email: req.body.email, err: err}
         r.error (err) ->
           console.error "Error registering user:"
           console.error err
