@@ -429,6 +429,7 @@ module.exports = (app) -> new class
             data: JSON.stringify {
               email: req.body.email
               validationCode: validationCode
+              registeredFromIP: req.ip
             }
           }
           r.success (user) ->

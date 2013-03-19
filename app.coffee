@@ -22,6 +22,7 @@ stylusCompile = (str, path) ->
     .use(nib())
 
 app.configure ->
+  app.set('trust proxy', true) # Required for nginx/etc
   app.locals.requiredVotes = process.env.REQUIRED_VOTES
   # Export the template name to templates
   app.use (req, res, next) ->
