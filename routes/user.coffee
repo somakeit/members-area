@@ -29,7 +29,7 @@ disallowedUsernameRegexps = [
 ]
 
 exports.list = (req, response, next) ->
-  query = "approved IS NOT NULL"
+  query = "approved IS NOT NULL AND YEAR(approved) > 2012"
   if req.session.admin
     query = ""
   r = User.findAll(query)
@@ -148,7 +148,7 @@ exports.auth = (req, response, next) ->
         if err or !res
           return render {data:req.body,err:new Error()}
         else
-          if user.approved?
+          if user.approved? and user.approved.getYear() > 112
             req.session.userId = user.id
             req.session.fullname = user.fullname
             req.session.username = user.username
@@ -210,7 +210,7 @@ exports.verify = (req, response) ->
           console.error err
           response.render 'message', {title: "Database issue", text: "Please try again later."}
         r.success ->
-          if user.approved?
+          if user.approved? and user.approved.getYear() > 112
             # XXX: email old address to tell them it has been replaced
             success()
           else

@@ -10,7 +10,7 @@ block content
     p Email: #{user.email}
     p Address:
       pre #{user.address}
-  if user.approved
+  if user.approved && user.approved.getYear() > 112
     p Member since: #{user.approved}
   else if admin
     form(method="POST").approval
