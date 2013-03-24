@@ -62,6 +62,19 @@ app.all '/user', user.list
 app.all '/user/:userId', user.view
 app.all '/subscription', subscription.index
 
+handle501 = (req, res) ->
+  res.statusCode = 501
+  tmp = req.path.match /^\/([^/]+)(\/|$)/
+  area = 'unknown'
+  if tmp
+    area = tmp[1]
+  res.render 501, {title:"Unimplemented Found", templateName: area}
+
+app.all '/account', handle501
+app.all '/account/*', handle501
+app.all '/admin', handle501
+app.all '/admin/*', handle501
+
 # This MUST come last!
 handle404 = (req, res) ->
   res.statusCode = 404
