@@ -5,7 +5,7 @@ block content
   ul
     each user in users
       li
-        if user.approved
+        if user.approved && user.approved.getYear() >= 113
           a(href="/user/#{user.id}") #{user.fullname} (#{user.username})
         else
           a(href="/user/#{user.id}") #{user.fullname} (#{user.username}) (pending)
