@@ -8,6 +8,8 @@ block content
       a(href="http://wiki.somakeit.org.uk/wiki/User:#{user.wikiname}") #{user.wikiname}
   if admin
     p Email: #{user.email}
+      if user.data.validationCode && user.email === user.data.email
+        strong(style='color:red')  (unverified)
     p Address:
       pre #{user.address}
   if user.approved && user.approved.getYear() > 112
