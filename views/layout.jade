@@ -57,7 +57,10 @@ html
                   a(href="/account") Account
 
                 -templates = ['subscription']
-                li(class=(templates.indexOf(templateName) != -1 ?  'active' : ''))
+                -className = (templates.indexOf(templateName) != -1 ?  'active' : '')
+                if !loggedInUser.paid_until || loggedInUser.paid_until.getTime() <= new Date().getTime()
+                  -className += " warning"
+                li(class=className)
                   a(href="/subscription") Subscription
 
                 -templates = ['users', 'user']

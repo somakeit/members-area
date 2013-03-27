@@ -143,12 +143,21 @@ module.exports = (app) -> new class
 
   auth: (req, response, next) ->
     response.locals.userId = null
+    response.locals.loggedInUser = null
     loggedIn = ->
       console.log req.session
       response.locals.userId = req.session?.userId
       response.locals.fullname = req.session?.fullname
       response.locals.admin = req.session?.admin
-      return next()
+      if req.session?.userId
+        r = User.find(req.session.userId)
+        r.error (err) ->
+          return next()
+        r.success (user) ->
+          response.locals.loggedInUser = user
+          return next()
+      else
+        return next()
     if req.session.userId? or ['/register', '/verify', '/forgot'].indexOf(req.path) isnt -1
       return loggedIn()
     render = (opts = {}) ->

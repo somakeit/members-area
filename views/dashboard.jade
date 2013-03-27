@@ -2,4 +2,11 @@ extends layout
 
 block content
   h2 Dashboard
-  p Blah
+  if !loggedInUser.paid_until || loggedInUser.paid_until.getTime() <= new Date().getTime()
+    p.text-error Your subscription payment is overdue - please 
+      a(href="/subscription") set up payments now
+      | .
+  else
+    p.text-success You're paid up until 
+      |= loggedInUser.paid_until.toString()
+      |  - thanks!
