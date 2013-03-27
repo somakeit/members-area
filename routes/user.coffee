@@ -36,7 +36,13 @@ module.exports = (app) -> new class
     r = User.findAll(query)
     r.error (err) ->
       response.render 'message', {title:"Error", text: "Unknown error occurred, please try again later."}
-    r.success (users) ->
+    r.success (models) ->
+      users = []
+      for model in models
+        user = model.toJSON()
+        try
+          user.data = JSON.parse user.data
+        users.push user
       response.render 'users', {title: "User list", users:users}
 
   view: (req, response, next) ->

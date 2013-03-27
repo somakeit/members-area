@@ -2,10 +2,18 @@ extends layout
 
 block content
   h2 User list
-  ul
+  ul.user-list
     each user in users
-      li
+      -className = ""
+      if !user.approved || user.approved.getYear() < 113
+        -className += " unapproved"
+      if user.data && user.data.validationCode && user.data.email == user.email
+        -className += " unverified"
+      li(class=className)
         if user.approved && user.approved.getYear() >= 113
           a(href="/user/#{user.id}") #{user.fullname} (#{user.username})
         else
-          a(href="/user/#{user.id}") #{user.fullname} (#{user.username}) (pending)
+          a(href="/user/#{user.id}") #{user.fullname} (#{user.username}) 
+            small (pending)
+              if user.data && user.data.validationCode && user.data.email == user.email
+                |  (unverified)
