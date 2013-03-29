@@ -18,9 +18,7 @@ block content
       if !user.paid_until || user.paid_until.getFullYear() < 2013
         p.text-error Member has made no payments.
       else if user.paid_until.getTime() <= new Date().getTime()
-        p.text-error Subscription overdue by #{Math.floor((+new Date() - +user.paid_until)/(24*60*60*1000))} days
-          a(href="/subscription") set up payments now
-          | .
+        p.text-error Subscription overdue by #{Math.floor((+new Date() - +user.paid_until)/(24*60*60*1000))} day(s).
       else
         p.text-success Paid up until 
           = user.paid_until.toString()
