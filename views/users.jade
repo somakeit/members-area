@@ -5,15 +5,27 @@ block content
   ul.user-list
     each user in users
       -className = ""
-      if !user.approved || user.approved.getYear() < 113
-        -className += " unapproved"
-      if user.data && user.data.validationCode && user.data.email == user.email
-        -className += " unverified"
-      li(class=className)
-        if user.approved && user.approved.getYear() >= 113
-          a(href="/user/#{user.id}") #{user.fullname} (#{user.username})
+      if loggedInUser.admin
+        if !user.approved || user.approved.getFullYear() < 2013
+          -className += " unapproved"
         else
-          a(href="/user/#{user.id}") #{user.fullname} (#{user.username}) 
-            small (pending)
-              if user.data && user.data.validationCode && user.data.email == user.email
-                |  (unverified)
+          if !user.paid_until || user.paid_until.getFullYear() < 2013
+            -className += " neverpaid"
+          else if +user.paid_until < +new Date()
+            -className += " overdue"
+        if user.data && user.data.validationCode && user.data.email == user.email
+          -className += " unverified"
+      li(class=className)
+        if user.approved && user.approved.getFullYear() >= 2013
+          a(href="/user/#{user.id}") #{user.fullname} (#{user.username})
+            if admin
+              if !user.paid_until || user.paid_until.getFullYear() < 2013
+                small  (never paid)
+              else if +user.paid_until < +new Date()
+                small  (overdue for #{Math.floor((+new Date() - user.paid_until)/(24*60*60*1000))} days)
+        else
+          a(href="/user/#{user.id}") #{user.fullname} (#{user.username})
+            if user.data && user.data.validationCode && user.data.email == user.email
+              small  (unverified)
+            else
+              small  (pending approval)
