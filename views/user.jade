@@ -12,8 +12,56 @@ block content
         strong(style='color:red')  (unverified)
     p Address:
       pre #{user.address}
-  if user.approved && user.approved.getYear() > 112
+  if user.approved && user.approved.getFullYear() > 2012
     p Member since: #{user.approved}
+    if admin
+      if !user.paid_until || user.paid_until.getFullYear() < 2013
+        p.text-error Member has made no payments.
+      else if user.paid_until.getTime() <= new Date().getTime()
+        p.text-error Subscription overdue by #{Math.floor((+new Date() - +user.paid_until)/(24*60*60*1000))} days
+          a(href="/subscription") set up payments now
+          | .
+      else
+        p.text-success Paid up until 
+          = user.paid_until.toString()
+      form(method='POST')
+        input(type='hidden', name='form', value='payment')
+        h3 ADMIN: register a cash payment
+        table
+          tr
+            td Amount
+            td
+              | £
+              input(name='amount', value='5')
+              if error && error.amount
+                p.txt-error Invalid amount - must be at least £5.
+          tr
+            td Duration (months)
+            td
+              select(name='duration')
+                option(value='1', selected="selected") 1 month
+                option(value='2') 2 month
+                option(value='3') 3 month
+                option(value='6') 6 month
+                option(value='12') 12 month
+              if error && error.duration
+                p.text-error Invalid duration - how did you manage that?
+          tr
+            td Date (YYYY-MM-DD)
+            td
+              - function p(n) { n = ""+n; return (n.length == 1 ? "0"+n : n); }
+              - function formatDate(d){ return (d.getFullYear())+"-"+p(d.getMonth()+1)+"-"+p(d.getDate());}
+              -dateString = formatDate(user.paid_until && user.paid_until.getFullYear() > 2012 ? user.paid_until : new Date())
+              input(name='date', value=dateString)
+              if error && error.date
+                p.text-error Invalid date.
+                if error.invalidYear
+                  p.text-error Invalid year
+                if error.invalidMonth
+                  p.text-error Invalid month
+                if error.invalidDay
+                  p.text-error Invalid day
+        button.btn.btn-warning(type='submit') Register payment
   else if admin
     form(method="POST").approval
       input(type='hidden', name='form', value='approval')

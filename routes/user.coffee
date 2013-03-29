@@ -1,4 +1,5 @@
 User = require '../models/user'
+Payment = require '../models/payment'
 nodemailer = require 'nodemailer'
 bcrypt = require 'bcrypt'
 
@@ -51,7 +52,7 @@ module.exports = (app) -> new class
     r.error (err) ->
       response.render 'message', {title: "Error", text:"DB issue?"}
     r.success (user) ->
-      render = ->
+      render = (error) ->
         if !user
           return next()
         u = user.toJSON()
@@ -61,7 +62,7 @@ module.exports = (app) -> new class
           u.data = {}
         u.data.votes ?= []
         voted = (u.data.votes.indexOf(req.session.userId) isnt -1)
-        response.render 'user', {title: user.fullname, user:u, voted: voted}
+        response.render 'user', {title: user.fullname, user:u, voted: voted, error: error}
       if req.method is 'POST' and req.session.admin and req.body.form is 'approval'
         if req.body.reject is '1'
           gmail.sendMail {
@@ -144,6 +145,77 @@ module.exports = (app) -> new class
                   response.render 'message', {title: "Error", text: "Failed to save user #{user.id} to the DB."}
         else
           render()
+      else if req.method is 'POST' and req.session.admin and req.body.form is 'payment'
+        {amount, duration, date} = req.body
+        error = new Error()
+        error.amount = true if !amount
+        error.duration = true if !duration
+        error.date = true if !date
+
+        amount = 100*parseFloat amount
+        if amount < 500
+          error.amount = true
+          error.amountTooSmall = true
+
+        duration = parseInt duration, 10
+        if [1, 2, 3, 6, 12].indexOf(duration) is -1
+          error.duration = true
+
+        matches = date.match /^([0-9]{4})-([0-9]{2})-([0-9]{2})$/
+        if !matches
+          error.date = true
+          error.dateInvalid = true
+        else
+          [ignore, year, month, day] = matches
+          year = parseInt year, 10
+          month = parseInt month, 10
+          day = parseInt day, 10
+          now = new Date()
+          if year > now.getFullYear()
+            error.date = true
+            error.invalidYear = true
+          if year < now.getFullYear() - 1
+            error.date = true
+            error.invalidYear = true
+          if [1..12].indexOf(month) is -1
+            error.date = true
+            error.invalidMonth = true
+          if [1..31].indexOf(day) is -1
+            error.date = true
+            error.invalidDay = true
+          if !error.date
+            from = new Date()
+            from.setFullYear year
+            from.setMonth month - 1
+            from.setDate day
+
+        if error.amount or error.duration or error.date
+          return render(error)
+
+        to = new Date(from.getTime())
+        to.setMonth to.getMonth() + duration
+
+        entry =
+          user_id: user.id
+          amount: amount
+          made: from
+          subscription_from: from
+          subscription_until: to
+          data: JSON.stringify fromAdmin: true
+        r = Payment.create entry
+        r.success (payment) ->
+          user.paid_until = to
+          r = user.save()
+          r.success ->
+            render()
+          r.error (err) ->
+            console.error "Failed to update paid_until"
+            console.error err
+            response.render 'message', {title: "Error", text: "Failed to update user paid_until"}
+        r.error (err) ->
+          console.error "Failed to create payment"
+          console.error err
+          response.render 'message', {title: "Error", text: "Failed to create payment"}
       else
         render()
 
@@ -188,7 +260,7 @@ module.exports = (app) -> new class
           if err or !res
             return render {data:req.body,err:new Error()}
           else
-            if user.approved? and user.approved.getYear() > 112
+            if user.approved? and user.approved.getFullYear() > 2012
               req.session.userId = user.id
               req.session.fullname = user.fullname
               req.session.username = user.username
@@ -250,7 +322,7 @@ module.exports = (app) -> new class
             console.error err
             response.render 'message', {title: "Database issue", text: "Please try again later."}
           r.success ->
-            if user.approved? and user.approved.getYear() > 112
+            if user.approved? and user.approved.getFullYear() > 2012
               # XXX: email old address to tell them it has been replaced
               success()
             else
