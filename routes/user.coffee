@@ -183,14 +183,13 @@ module.exports = (app) -> new class
           if [1..31].indexOf(day) is -1
             error.date = true
             error.invalidDay = true
-          if !error.date
-            from = new Date()
-            from.setFullYear year
-            from.setMonth month - 1
-            from.setDate day
 
         if error.amount or error.duration or error.date
           return render(error)
+
+        from = new Date()
+        from.setFullYear year
+        from.setMonth month - 1, day
 
         to = new Date(from.getTime())
         to.setMonth to.getMonth() + duration
