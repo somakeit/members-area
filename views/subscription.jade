@@ -2,11 +2,20 @@ extends layout
 
 block content
   h2 Subscription
-  p We have received no subscription payments from you yet (payments may take
-    |  a couple of days to show up). Please set up a standing order to:
-  p Sort code: ..-..-..
-    br
-    | Account number: .... ....
-  p Remember: subscription is pay what you think the space is worth
+  if !loggedInUser.paid_until || loggedInUser.paid_until.getFullYear() < 2013
+    p.text-error We have received no subscription payments from you yet (payments may take
+      |  a couple of days to show up). Please set up a standing order to:
+    p Sort code: ..-..-..
+      br
+      | Account number: .... ....
+  else if +loggedInUser.paid_until < +new Date()
+    p.text-warning Your subscription is overdue. Please set up or check your standing order to:
+    p Sort code: ..-..-..
+      br
+      | Account number: .... ....
+  else
+    p.text-success Your subscription is up to date - thanks very much!
+    p
+  p.muted Remember: subscription is pay what you think the space is worth
     |  (minimum £5/mo), but we require an average of £20/member/mo to keep
     |  the space running - please be generous!
