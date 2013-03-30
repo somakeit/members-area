@@ -29,9 +29,9 @@ disallowedUsernameRegexps = [
 
 module.exports = (app) -> new class
   list: (req, response, next) ->
-    query = "approved IS NOT NULL AND YEAR(approved) > 2012"
+    query = {where:"approved IS NOT NULL AND approved > '2013-01-01'"}
     if req.session.admin
-      query = ""
+      query = {where:""}
     r = req.User.findAll(query)
     r.error (err) ->
       response.render 'message', {title:"Error", text: "Unknown error occurred, please try again later."}
