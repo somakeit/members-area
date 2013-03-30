@@ -144,13 +144,18 @@ module.exports = (app) -> new class
         else
           render()
       else if req.method is 'POST' and req.session.admin and req.body.form is 'payment'
-        {amount, duration, date} = req.body
+        {amount, duration, date, type} = req.body
         error = new Error()
+        error.type = true if !type
         error.amount = true if !amount
         error.duration = true if !duration
         error.date = true if !date
 
-        amount = 100*parseFloat amount
+        if type isnt 'CASH'
+          error.type = true
+          error.invalidType = type
+
+        amount = parseInt(100*parseFloat(amount), 10)
         if amount < 500
           error.amount = true
           error.amountTooSmall = true
@@ -182,7 +187,7 @@ module.exports = (app) -> new class
             error.date = true
             error.invalidDay = true
 
-        if error.amount or error.duration or error.date
+        if error.amount or error.duration or error.date or error.type
           return render(error)
 
         from = new Date()
@@ -194,6 +199,7 @@ module.exports = (app) -> new class
 
         entry =
           user_id: user.id
+          type: type
           amount: amount
           made: from
           subscription_from: from

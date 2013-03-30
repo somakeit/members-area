@@ -25,7 +25,7 @@ for model in models
   module.exports[model] = sequelize.import __dirname + "/" + model.toLowerCase()
 
 m = module.exports
-m.Payment.belongsTo m.User
-m.User.hasMany m.Payment
+m.Payment.belongsTo m.User, foreignKey: 'user_id'
+m.User.hasMany m.Payment, foreignKey: 'user_id'
 
 module.exports.sequelize = sequelize

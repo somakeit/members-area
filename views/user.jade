@@ -24,6 +24,7 @@ block content
           = user.paid_until.toString()
       form(method='POST')
         input(type='hidden', name='form', value='payment')
+        input(type='hidden', name='type', value='CASH')
         h3 ADMIN: register a cash payment
         table
           tr
@@ -47,8 +48,6 @@ block content
           tr
             td Date (YYYY-MM-DD)
             td
-              - function p(n) { n = ""+n; return (n.length == 1 ? "0"+n : n); }
-              - function formatDate(d){ return (d.getFullYear())+"-"+p(d.getMonth()+1)+"-"+p(d.getDate());}
               -dateString = formatDate(user.paid_until && user.paid_until.getFullYear() > 2012 ? user.paid_until : new Date())
               input(name='date', value=dateString)
               if error && error.date

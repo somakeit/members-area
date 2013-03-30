@@ -32,6 +32,14 @@ app.configure ->
     res.render = (templateName) ->
       res.locals.templateName = templateName
       return render.apply this, arguments
+    res.locals.pad = (n, l=2, p="0") ->
+      n = ""+n
+      if n.length < l
+        n = new Array(l - n.length + 1).join(p) + n
+      return n
+    res.locals.formatDate = (d) ->
+      p = res.locals.pad
+      return (d.getFullYear())+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())
     next()
 
   app.use stylus.middleware

@@ -15,7 +15,21 @@ block content
       | Account number: .... ....
   else
     p.text-success Your subscription is up to date - thanks very much!
+    p Your next payment is due: 
+      strong= formatDate(loggedInUser.paid_until)
     p
   p.muted Remember: subscription is pay what you think the space is worth
     |  (minimum £5/mo), but we require an average of £20/member/mo to keep
     |  the space running - please be generous!
+  h3 Payments
+  if err
+    p.text-error Error loading payments from DB.
+  else
+    table.table
+      tr
+        each entry, key in columns
+          th= entry.t
+      for payment in payments
+        tr
+          each entry, key in columns
+            td= entry.f(payment[key], payment)
