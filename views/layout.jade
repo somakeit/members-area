@@ -39,7 +39,11 @@ html
                 a(href='http://wiki.somakeit.org.uk/') Wiki
             ul.nav.pull-right
               li.active
-                a(href='#{process.env.SERVER_ADDRESS}/') Members area
+                a(href='#{process.env.SERVER_ADDRESS}/')
+                  if loggedInUser
+                    | #{loggedInUser.fullname}
+                  else
+                    | Members area
     #main.container
       block body
         if userId
