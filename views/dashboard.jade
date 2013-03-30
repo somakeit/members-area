@@ -2,6 +2,13 @@ extends layout
 
 block content
   h2 Dashboard
+  p Hello #{loggedInUser.fullname}! Welcome to the So Make It members site.
+    | It's a bit low on functionality at the moment, but if you feel like adding
+    | some (or making it a bit friendlier, or...), please do 
+    a(href="http://github.com/so-make-it/members-area") get involved!
+  if loggedInUser.admin
+    p.text-info You're an admin! Most admin functionality operates via profiles - have a look at the members list.
+  h4 Subscription status
   if !loggedInUser.paid_until || loggedInUser.paid_until.getTime() <= new Date().getTime()
     p.text-error Your subscription payment is overdue - please 
       a(href="/subscription") set up payments now
