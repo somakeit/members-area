@@ -15,6 +15,8 @@ block content
   if user.approved && user.approved.getFullYear() > 2012
     p Member since: #{user.approved}
     if admin
+      hr
+      h3 ADMIN STUFF
       if !user.paid_until || user.paid_until.getFullYear() < 2013
         p.text-error Member has made no payments.
       else if user.paid_until.getTime() <= new Date().getTime()
@@ -22,10 +24,22 @@ block content
       else
         p.text-success Paid up until 
           = user.paid_until.toString()
+      h4 Payments
+      if payments.length == 0
+        p.text-error No payments made
+      else
+        table.table
+          tr
+            each entry, key in paymentColumns
+              th= entry.t
+          for payment in payments
+            tr
+              each entry, key in paymentColumns
+                td= entry.f(payment[key], payment)
       form(method='POST')
         input(type='hidden', name='form', value='payment')
         input(type='hidden', name='type', value='CASH')
-        h3 ADMIN: register a cash payment
+        h4 Register a cash payment
         table
           tr
             td Amount

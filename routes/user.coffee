@@ -34,6 +34,8 @@ module.exports = (app) -> new class
       query = {where:""}
     r = req.User.findAll(query)
     r.error (err) ->
+      console.error "Error occurred listing users."
+      console.error err
       response.render 'message', {title:"Error", text: "Unknown error occurred, please try again later."}
     r.success (models) ->
       users = []
@@ -60,7 +62,14 @@ module.exports = (app) -> new class
           u.data = {}
         u.data.votes ?= []
         voted = (u.data.votes.indexOf(req.session.userId) isnt -1)
-        response.render 'user', {title: user.fullname, user:u, voted: voted, error: error}
+        gotPayments = (payments) ->
+          response.render 'user', {title: user.fullname, user:u, voted: voted, error: error, payments: payments}
+        if response.locals.loggedInUser.admin
+          user.getPayments().done (err, payments) ->
+            payments.sort (a, b) -> return +b.made - a.made
+            gotPayments(payments)
+        else
+          gotPayments(null)
       if req.method is 'POST' and req.session.admin and req.body.form is 'approval'
         if req.body.reject is '1'
           gmail.sendMail {

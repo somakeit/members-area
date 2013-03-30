@@ -25,11 +25,14 @@ block content
   if err
     p.text-error Error loading payments from DB.
   else
-    table.table
-      tr
-        each entry, key in columns
-          th= entry.t
-      for payment in payments
+    if payments.length == 0
+      p.text-error No payments made
+    else
+      table.table
         tr
-          each entry, key in columns
-            td= entry.f(payment[key], payment)
+          each entry, key in paymentColumns
+            th= entry.t
+        for payment in payments
+          tr
+            each entry, key in paymentColumns
+              td= entry.f(payment[key], payment)

@@ -32,14 +32,36 @@ app.configure ->
     res.render = (templateName) ->
       res.locals.templateName = templateName
       return render.apply this, arguments
-    res.locals.pad = (n, l=2, p="0") ->
+    pad = res.locals.pad = (n, l=2, p="0") ->
       n = ""+n
       if n.length < l
         n = new Array(l - n.length + 1).join(p) + n
       return n
-    res.locals.formatDate = (d) ->
-      p = res.locals.pad
-      return (d.getFullYear())+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())
+    formatDate = res.locals.formatDate = (d) ->
+      return (d.getFullYear())+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())
+    res.locals.paymentColumns =
+      made:
+        t: 'Payment date'
+        f: formatDate
+      amount:
+        t: 'Amount'
+        f: (t) ->
+          t = parseInt t
+          pounds = Math.floor t/100
+          pence = t % 100
+          return "£#{pounds}.#{pad pence}"
+      type:
+        t: 'Type'
+        f: (t) -> t.toUpperCase()
+      subscription_from:
+        t: 'Description'
+        f: (t, entry) ->
+          diff = +entry.subscription_until - entry.subscription_from
+          diff /= 30 * 24 * 60 * 60 * 1000
+          diff = Math.round diff
+          duration = diff + " month" + (if diff is 1 then "" else "s")
+          from = formatDate entry.subscription_from
+          return "#{duration} from #{from}"
     next()
 
   app.use stylus.middleware

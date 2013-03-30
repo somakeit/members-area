@@ -23,7 +23,7 @@ block content
                 small  (never paid)
               else if +user.paid_until < +new Date()
                 small  (overdue for #{Math.floor((+new Date() - user.paid_until)/(24*60*60*1000))} days)
-        else
+        else if admin
           a(href="/user/#{user.id}") #{user.fullname} (#{user.username})
             if user.data && user.data.validationCode && user.data.email == user.email
               small  (unverified)
