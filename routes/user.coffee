@@ -1,5 +1,3 @@
-User = require '../models/user'
-Payment = require '../models/payment'
 nodemailer = require 'nodemailer'
 bcrypt = require 'bcrypt'
 
@@ -34,7 +32,7 @@ module.exports = (app) -> new class
     query = "approved IS NOT NULL AND YEAR(approved) > 2012"
     if req.session.admin
       query = ""
-    r = User.findAll(query)
+    r = req.User.findAll(query)
     r.error (err) ->
       response.render 'message', {title:"Error", text: "Unknown error occurred, please try again later."}
     r.success (models) ->
@@ -48,7 +46,7 @@ module.exports = (app) -> new class
 
   view: (req, response, next) ->
     id = req.params.userId
-    r = User.find(id)
+    r = req.User.find(id)
     r.error (err) ->
       response.render 'message', {title: "Error", text:"DB issue?"}
     r.success (user) ->
@@ -201,7 +199,7 @@ module.exports = (app) -> new class
           subscription_from: from
           subscription_until: to
           data: JSON.stringify fromAdmin: true
-        r = Payment.create entry
+        r = req.Payment.create entry
         r.success (payment) ->
           user.paid_until = to
           r = user.save()
@@ -227,7 +225,7 @@ module.exports = (app) -> new class
       response.locals.fullname = req.session?.fullname
       response.locals.admin = req.session?.admin
       if req.session?.userId
-        r = User.find(req.session.userId)
+        r = req.User.find(req.session.userId)
         r.error (err) ->
           return next()
         r.success (user) ->
@@ -249,7 +247,7 @@ module.exports = (app) -> new class
         query = where:{email:email}
       else
         query = where:{username:email}
-      r = User.find(query)
+      r = req.User.find(query)
       r.error (err) ->
         return render({data:req.body,err})
       r.success (user) ->
@@ -294,7 +292,7 @@ module.exports = (app) -> new class
     if isNaN(id) or id <= 0 or validationCode.length isnt 8
       fail()
     else
-      r = User.find(id)
+      r = req.User.find(id)
       r.error (err) ->
         fail()
       r.success (user) ->
@@ -377,7 +375,7 @@ module.exports = (app) -> new class
         return render()
       if req.query.id?
         id = parseInt(req.query.id, 10)
-        r = User.find(id)
+        r = req.User.find(id)
         r.error (err) ->
           response.render 'message', {title:"Error", text: "Unknown error occurred, please try again later."}
         r.success (user) ->
@@ -414,7 +412,7 @@ module.exports = (app) -> new class
               success()
 
       else if req.body.email?
-        r = User.find(where:{email:req.body.email})
+        r = req.User.find(where:{email:req.body.email})
         r.error (err) ->
           return render({data:req.body,err})
         r.success (user) ->
@@ -505,7 +503,7 @@ module.exports = (app) -> new class
         bcrypt.hash req.body.password, 10, (err, hash) ->
           if err
             return fail()
-          r = User.create {
+          r = req.User.create {
             email: req.body.email
             username: req.body.username
             password: hash

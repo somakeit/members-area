@@ -1,15 +1,14 @@
-{sqz, Sequelize} = require '../sequelize'
-
-module.exports = sqz.define 'User', {
-  id: {type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true}
-  email: {type: Sequelize.STRING, allowNull: false, unique: true, validate:{isEmail:true}}
-  username: {type: Sequelize.STRING, allowNull: false, unique: true}
-  password: {type: Sequelize.STRING, allowNull: false}
-  admin: {type: Sequelize.BOOLEAN, allowNull: false, defaultValue: false}
-  paid_until: {type: Sequelize.DATE, allowNull: true}
-  fullname: {type: Sequelize.STRING, allowNull: false}
-  address: {type: Sequelize.TEXT, allowNull: false}
-  wikiname: {type: Sequelize.STRING, allowNull:true}
-  approved: {type: Sequelize.DATE, allowNull: true}
-  data: {type:Sequelize.TEXT, allowNull: false}
-}, {timestamps: true}
+module.exports = (sequelize, DataTypes) ->
+  return sequelize.define 'User', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true}
+    email: {type: DataTypes.STRING, allowNull: false, unique: true, validate:{isEmail:true}}
+    username: {type: DataTypes.STRING, allowNull: false, unique: true}
+    password: {type: DataTypes.STRING, allowNull: false}
+    admin: {type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false}
+    paid_until: {type: DataTypes.DATE, allowNull: true}
+    fullname: {type: DataTypes.STRING, allowNull: false}
+    address: {type: DataTypes.TEXT, allowNull: false}
+    wikiname: {type: DataTypes.STRING, allowNull:true}
+    approved: {type: DataTypes.DATE, allowNull: true}
+    data: {type:DataTypes.TEXT, allowNull: false}
+  }, {timestamps: true}

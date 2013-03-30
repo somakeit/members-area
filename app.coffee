@@ -8,6 +8,7 @@ net = require 'net'
 
 # Fix/load/check environmental variables
 require './env'
+models = require './models'
 
 app = express()
 
@@ -26,6 +27,7 @@ app.configure ->
   app.locals.requiredVotes = process.env.REQUIRED_VOTES
   # Export the template name to templates
   app.use (req, res, next) ->
+    req[k] = v for k, v of models
     render = res.render
     res.render = (templateName) ->
       res.locals.templateName = templateName
