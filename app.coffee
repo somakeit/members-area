@@ -8,6 +8,8 @@ fs = require 'fs'
 net = require 'net'
 winston = require 'winston'
 
+process.chdir __dirname
+
 # Fix/load/check environmental variables
 require './env'
 models = require './models'
