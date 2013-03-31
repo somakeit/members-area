@@ -1,6 +1,5 @@
-{sqz, Sequelize} = require './sequelize'
-require './models/user'
-require './models/payment'
+require './env'
+models = require './models/'
 
-sqz.sync().error (err) ->
+models.sequelize.sync().error (err) ->
   console.error err
