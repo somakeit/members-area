@@ -5,7 +5,7 @@ module.exports = (sequelize, DataTypes) ->
     username: {type: DataTypes.STRING, allowNull: false, unique: true}
     password: {type: DataTypes.STRING, allowNull: false}
     admin: {type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false}
-    paid_until: {type: DataTypes.DATE, allowNull: true}
+    paidUntil: {type: DataTypes.DATE, allowNull: true}
     fullname: {type: DataTypes.STRING, allowNull: false}
     address: {type: DataTypes.TEXT, allowNull: false}
     wikiname: {type: DataTypes.STRING, allowNull:true}

@@ -216,14 +216,14 @@ module.exports = (app) -> new class
           data: JSON.stringify fromAdmin: true
         r = req.Payment.create entry
         r.success (payment) ->
-          user.paid_until = to
+          user.paidUntil = to
           r = user.save()
           r.success ->
             render()
           r.error (err) ->
-            console.error "Failed to update paid_until"
+            console.error "Failed to update paidUntil"
             console.error err
-            response.render 'message', {title: "Error", text: "Failed to update user paid_until"}
+            response.render 'message', {title: "Error", text: "Failed to update user paidUntil"}
         r.error (err) ->
           console.error "Failed to create payment"
           console.error err

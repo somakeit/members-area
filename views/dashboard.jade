@@ -9,11 +9,11 @@ block content
   if loggedInUser.admin
     p.text-info You're an admin! Most admin functionality operates via profiles - have a look at the members list.
   h4 Subscription status
-  if !loggedInUser.paid_until || loggedInUser.paid_until.getTime() <= new Date().getTime()
+  if !loggedInUser.paidUntil || loggedInUser.paidUntil.getTime() <= new Date().getTime()
     p.text-error Your subscription payment is overdue - please 
       a(href="/subscription") set up payments now
       | .
   else
     p.text-success You're paid up until 
-      strong= loggedInUser.paid_until.toString()
+      strong= loggedInUser.paidUntil.toString()
       |  - thanks!

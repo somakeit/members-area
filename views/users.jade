@@ -9,9 +9,9 @@ block content
         if !user.approved || user.approved.getFullYear() < 2013
           -className += " unapproved"
         else
-          if !user.paid_until || user.paid_until.getFullYear() < 2013
+          if !user.paidUntil || user.paidUntil.getFullYear() < 2013
             -className += " neverpaid"
-          else if +user.paid_until < +new Date()
+          else if +user.paidUntil < +new Date()
             -className += " overdue"
         if user.data && user.data.validationCode && user.data.email == user.email
           -className += " unverified"
@@ -19,10 +19,10 @@ block content
         if user.approved && user.approved.getFullYear() >= 2013
           a(href="/user/#{user.id}") #{user.fullname} (#{user.username})
             if admin
-              if !user.paid_until || user.paid_until.getFullYear() < 2013
+              if !user.paidUntil || user.paidUntil.getFullYear() < 2013
                 small  (never paid)
-              else if +user.paid_until < +new Date()
-                small  (overdue for #{Math.floor((+new Date() - user.paid_until)/(24*60*60*1000))} days)
+              else if +user.paidUntil < +new Date()
+                small  (overdue for #{Math.floor((+new Date() - user.paidUntil)/(24*60*60*1000))} days)
         else if admin
           a(href="/user/#{user.id}") #{user.fullname} (#{user.username})
             if user.data && user.data.validationCode && user.data.email == user.email

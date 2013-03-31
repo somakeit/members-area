@@ -17,13 +17,13 @@ block content
     if admin
       hr
       h3 ADMIN STUFF
-      if !user.paid_until || user.paid_until.getFullYear() < 2013
+      if !user.paidUntil || user.paidUntil.getFullYear() < 2013
         p.text-error Member has made no payments.
-      else if user.paid_until.getTime() <= new Date().getTime()
-        p.text-error Subscription overdue by #{Math.floor((+new Date() - +user.paid_until)/(24*60*60*1000))} day(s).
+      else if user.paidUntil.getTime() <= new Date().getTime()
+        p.text-error Subscription overdue by #{Math.floor((+new Date() - +user.paidUntil)/(24*60*60*1000))} day(s).
       else
         p.text-success Paid up until 
-          = user.paid_until.toString()
+          = user.paidUntil.toString()
       h4 Payments
       if payments.length == 0
         p.text-error No payments made
@@ -62,7 +62,7 @@ block content
           tr
             td Date (YYYY-MM-DD)
             td
-              -dateString = formatDate(user.paid_until && user.paid_until.getFullYear() > 2012 ? user.paid_until : new Date())
+              -dateString = formatDate(user.paidUntil && user.paidUntil.getFullYear() > 2012 ? user.paidUntil : new Date())
               input(name='date', value=dateString)
               if error && error.date
                 p.text-error Invalid date.

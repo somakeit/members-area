@@ -2,13 +2,13 @@ extends layout
 
 block content
   h2 Subscription
-  if !loggedInUser.paid_until || loggedInUser.paid_until.getFullYear() < 2013
+  if !loggedInUser.paidUntil || loggedInUser.paidUntil.getFullYear() < 2013
     p.text-error We have received no subscription payments from you yet (payments may take
       |  a couple of days to show up). Please set up a standing order to:
     p Sort code: ..-..-..
       br
       | Account number: .... ....
-  else if +loggedInUser.paid_until < +new Date()
+  else if +loggedInUser.paidUntil < +new Date()
     p.text-warning Your subscription is overdue. Please set up or check your standing order to:
     p Sort code: ..-..-..
       br
@@ -16,7 +16,7 @@ block content
   else
     p.text-success Your subscription is up to date - thanks very much!
     p Your next payment is due: 
-      strong= formatDate(loggedInUser.paid_until)
+      strong= formatDate(loggedInUser.paidUntil)
     p
   p.muted Remember: subscription is pay what you think the space is worth
     |  (minimum £5/mo), but we require an average of £20/member/mo to keep
