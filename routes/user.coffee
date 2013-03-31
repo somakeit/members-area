@@ -153,12 +153,13 @@ module.exports = (app) -> new class
         else
           render()
       else if req.method is 'POST' and req.session.admin and req.body.form is 'payment'
-        {amount, duration, date, type} = req.body
+        {amount, duration, made, type, subscriptionFrom} = req.body
         error = new Error()
         error.type = true if !type
         error.amount = true if !amount
         error.duration = true if !duration
-        error.date = true if !date
+        error.made = true if !made
+        error.subscriptionFrom = true if !subscriptionFrom
 
         if type isnt 'CASH'
           error.type = true
@@ -173,35 +174,47 @@ module.exports = (app) -> new class
         if [1, 2, 3, 6, 12].indexOf(duration) is -1
           error.duration = true
 
-        matches = date.match /^([0-9]{4})-([0-9]{2})-([0-9]{2})$/
-        if !matches
-          error.date = true
-          error.dateInvalid = true
-        else
-          [ignore, year, month, day] = matches
-          year = parseInt year, 10
-          month = parseInt month, 10
-          day = parseInt day, 10
-          now = new Date()
-          if year > now.getFullYear()
-            error.date = true
-            error.invalidYear = true
-          if year < now.getFullYear() - 1
-            error.date = true
-            error.invalidYear = true
-          if [1..12].indexOf(month) is -1
-            error.date = true
-            error.invalidMonth = true
-          if [1..31].indexOf(day) is -1
-            error.date = true
-            error.invalidDay = true
+        validateDate = (name, val, options = {}) ->
+          {allowFuture} = options
+          matches = val.match /^([0-9]{4})-([0-9]{2})-([0-9]{2})$/
+          if !matches
+            error[name] = true
+            error[name+"DateInvalid"] = true
+          else
+            [ignore, year, month, day] = matches
+            year = parseInt year, 10
+            month = parseInt month, 10
+            day = parseInt day, 10
+            now = new Date()
+            if year > now.getFullYear()+1
+              error[name] = true
+              error[name+"InvalidYear"] = true
+            if year < now.getFullYear() - 1
+              error[name] = true
+              error[name+"InvalidYear"] = true
+            if [1..12].indexOf(month) is -1
+              error[name] = true
+              error[name+"InvalidMonth"] = true
+            if [1..31].indexOf(day) is -1
+              error[name] = true
+              error[name+"InvalidDay"] = true
+          if error[name]
+            return null
+          else
+            result = new Date()
+            result.setFullYear year
+            result.setMonth month - 1, day
+            if !allowFuture and result.getTime() > now.getTime()
+              error[name] = true
+              error[name+"IsInFuture"] = true
+              return null
+            return result
 
-        if error.amount or error.duration or error.date or error.type
+        made = validateDate 'made', made
+        from = validateDate 'subscriptionFrom', subscriptionFrom, {allowFuture:true}
+
+        if error.amount or error.duration or error.made or error.type or error.subscriptionFrom
           return render(error)
-
-        from = new Date()
-        from.setFullYear year
-        from.setMonth month - 1, day
 
         to = new Date(from.getTime())
         to.setMonth to.getMonth() + duration
@@ -210,7 +223,7 @@ module.exports = (app) -> new class
           UserId: user.id
           type: type
           amount: amount
-          made: from
+          made: made
           subscriptionFrom: from
           subscriptionUntil: to
           data: JSON.stringify fromAdmin: true

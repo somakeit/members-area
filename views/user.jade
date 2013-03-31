@@ -40,16 +40,51 @@ block content
         input(type='hidden', name='form', value='payment')
         input(type='hidden', name='type', value='CASH')
         h4 Register a cash payment
-        table
+        p.text-info
+          strong The form below has sensible defaults, please ensure you understand what they mean if you change them.
+        table.table.table-bordered(style='width:auto')
           tr
-            td Amount
+            th Payment date
+              br
+              small (YYYY-MM-DD)
             td
-              | £
+              -dateString = formatDate(new Date())
+              input(name='made', value=dateString)
+              if error && error.date
+                p.text-error Invalid date.
+                if error.invalidYear
+                  p.text-error Invalid year
+                if error.invalidMonth
+                  p.text-error Invalid month
+                if error.invalidDay
+                  p.text-error Invalid day
+          tr
+            th Amount
+              br
+              small £ (GBP)
+            td
               input(name='amount', value='5')
               if error && error.amount
                 p.txt-error Invalid amount - must be at least £5.
           tr
-            td Duration (months)
+            th Period start
+              br
+              small (YYYY-MM-DD)
+            td
+              -dateString = formatDate(user.paidUntil && user.paidUntil.getFullYear() > 2012 ? user.paidUntil : new Date())
+              input(name='subscriptionFrom', value=dateString)
+              if error && error.date
+                p.text-error Invalid date.
+                if error.invalidYear
+                  p.text-error Invalid year
+                if error.invalidMonth
+                  p.text-error Invalid month
+                if error.invalidDay
+                  p.text-error Invalid day
+          tr
+            th Duration 
+              br
+              small (months, the period covered by the payment)
             td
               select(name='duration')
                 option(value='1', selected="selected") 1 month
@@ -59,19 +94,6 @@ block content
                 option(value='12') 12 month
               if error && error.duration
                 p.text-error Invalid duration - how did you manage that?
-          tr
-            td Date (YYYY-MM-DD)
-            td
-              -dateString = formatDate(user.paidUntil && user.paidUntil.getFullYear() > 2012 ? user.paidUntil : new Date())
-              input(name='date', value=dateString)
-              if error && error.date
-                p.text-error Invalid date.
-                if error.invalidYear
-                  p.text-error Invalid year
-                if error.invalidMonth
-                  p.text-error Invalid month
-                if error.invalidDay
-                  p.text-error Invalid day
         button.btn.btn-warning(type='submit') Register payment
   else if admin
     form(method="POST").approval
