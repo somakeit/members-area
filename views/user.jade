@@ -28,7 +28,7 @@ block content
       if payments.length == 0
         p.text-error No payments made
       else
-        table.table
+        table.table.table-striped
           tr
             each entry, key in paymentColumns
               th= entry.t
