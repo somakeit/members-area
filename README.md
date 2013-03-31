@@ -9,10 +9,6 @@ Running it locally
 First make sure you're running at least v0.8 of Node.JS, and that you
 have `npm` installed (you should - it's bundled with Node!). Then:
 
-### Install CoffeeScript globally
-
-`[sudo] npm install -g coffee-script`
-
 ### Clone and enter directory
 `git clone git@github.com:so-make-it/members-area.git && cd members-area`
 
@@ -43,8 +39,13 @@ This will create a SQLite DB at `./db.sqlite` and apply the table models.
 
 `coffee setup`
 
-### Start the server
-`coffee app`
+### Start the development server
+`./run`
+
+(Note: this has CoffeeScript compile everything to JavaScript with
+source mapping support enabled, and then runs the JavaScript. When a
+CoffeeScript file changes it will recompile to the relevant JavaScript
+file which will cause the server to restart automatically.)
 
 ### Open your browser
-To http://localhost:1337 and you should have it running :)
+To [http://localhost:1337](http://localhost:1337) and you should have it running :)

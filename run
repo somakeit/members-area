@@ -1,0 +1,5 @@
+#!/bin/bash
+node_modules/.bin/coffee --compile --map .
+node_modules/.bin/coffee --compile --map --watch . & COFFEE_PID=$!
+node_modules/.bin/nodemon app.js
+kill $COFFEE_PID 2>/dev/null

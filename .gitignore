@@ -2,3 +2,5 @@ public/css/*.css
 .env
 node_modules
 db.sqlite
+*.js
+*.map
