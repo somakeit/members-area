@@ -128,6 +128,7 @@ app.all '/forgot', user.forgot
 
 # Logged in
 app.all '/', dashboard.index
+app.all '/logout', user.logout
 app.all '/user', user.list
 app.all '/user/:userId', user.view
 app.all '/subscription', subscription.index

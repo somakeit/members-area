@@ -230,6 +230,11 @@ module.exports = (app) -> new class
       else
         render()
 
+  logout: (req, response, next) ->
+    if req.method is 'POST' and req.body.form is 'logout'
+      req.session.destroy()
+    response.redirect 307, "/"
+
   auth: (req, response, next) ->
     response.locals.userId = null
     response.locals.loggedInUser = null
