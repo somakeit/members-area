@@ -175,6 +175,8 @@ if typeof port is 'string'
           process.exit 1
         winston.info "Liberated unused socket."
         listen port
+    else if err?.code is 'ENOENT'
+      listen port
     else
       winston.error "Socket '#{port}' in use? #{err}"
       process.exit 1
