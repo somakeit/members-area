@@ -5,7 +5,7 @@ module.exports = (sequelize, DataTypes) ->
     type: {type:DataTypes.STRING, allowNull: false}
     amount: {type:DataTypes.INTEGER, allowNull: false} # In pennies!
     made: {type: DataTypes.DATE, allowNull: false}
-    subscription_from: {type: DataTypes.DATE, allowNull: false}
-    subscription_until: {type: DataTypes.DATE, allowNull: false}
+    subscriptionFrom: {type: DataTypes.DATE, allowNull: false}
+    subscriptionUntil: {type: DataTypes.DATE, allowNull: false}
     data: {type:DataTypes.TEXT, allowNull: false} # JSON
   }, {timestamps: true}

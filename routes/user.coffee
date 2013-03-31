@@ -211,8 +211,8 @@ module.exports = (app) -> new class
           type: type
           amount: amount
           made: from
-          subscription_from: from
-          subscription_until: to
+          subscriptionFrom: from
+          subscriptionUntil: to
           data: JSON.stringify fromAdmin: true
         r = req.Payment.create entry
         r.success (payment) ->

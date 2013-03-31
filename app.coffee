@@ -54,14 +54,14 @@ app.configure ->
       type:
         t: 'Type'
         f: (t) -> t.toUpperCase()
-      subscription_from:
+      subscriptionFrom:
         t: 'Description'
         f: (t, entry) ->
-          diff = +entry.subscription_until - entry.subscription_from
+          diff = +entry.subscriptionUntil - entry.subscriptionFrom
           diff /= 30 * 24 * 60 * 60 * 1000
           diff = Math.round diff
           duration = diff + " month" + (if diff is 1 then "" else "s")
-          from = formatDate entry.subscription_from
+          from = formatDate entry.subscriptionFrom
           return "#{duration} from #{from}"
     next()
 
