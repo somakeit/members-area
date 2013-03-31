@@ -6,6 +6,7 @@ nib = require 'nib'
 stylus = require('stylus')
 fs = require 'fs'
 net = require 'net'
+winston = require 'winston'
 
 # Fix/load/check environmental variables
 require './env'
@@ -73,15 +74,40 @@ app.configure ->
   app.set 'views', __dirname + '/views'
   app.set 'view engine', 'jade'
   app.use express.favicon(path.join(__dirname, 'public', 'img', 'favicon.png'))
+
+  try
+    fs.mkdirSync 'log'
+
+  # Request logging
+  logStream = fs.createWriteStream 'log/access.log', {flags: 'a', mode: 0o600}
+  app.use express.logger
+    stream: logStream
+    format: ':remote-addr - - [:date] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" - :response-time ms'
   if process.env.NODE_ENV is 'development'
+    # Also log to console
     app.use express.logger('dev')
-  else
-    try
-      fs.mkdirSync 'log'
-    logStream = fs.createWriteStream 'log/access.log', {flags: 'a', mode: 0o600}
-    app.use express.logger
-      stream: logStream
-      format: ':remote-addr - - [:date] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" - :response-time ms'
+
+  # Winston logging
+  winston.remove winston.transports.Console
+  winston.add winston.transports.Console, timestamp: true, colorize: true
+  winston.add winston.transports.File, {filename: "log/winston.log", maxsize: 50000000, maxFiles: 8, level: 'warn'}
+  winston.handleExceptions new winston.transports.File {filename: 'log/crash.log'}
+  app.use (req, res, next) ->
+    req.winston = winston
+    details =
+    wrap = (fn) ->
+      return (args...) ->
+        details = {method: req.method, path: req.path, ip: req.ip}
+        if res.locals.loggedInUser?
+          details.userId = res.locals.loggedInUser.id
+          details.username = res.locals.loggedInUser.username
+        fn args, details
+    req.info = wrap winston.info
+    req.log = req.info
+    req.warn = wrap winston.warn
+    req.error = wrap winston.error
+    return next()
+
   app.use express.bodyParser()
   app.use express.methodOverride()
   app.use express.cookieParser(process.env.SECRET ? 'your secret here')

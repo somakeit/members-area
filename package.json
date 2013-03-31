@@ -14,7 +14,8 @@
     "nodemailer": "~0.3.43",
     "bcrypt": "~0.7.4",
     "nib": "~0.9.1",
-    "source-map-support": "~0.1.2"
+    "source-map-support": "~0.1.2",
+    "winston": "~0.6.2"
   },
   "devDependencies": {
     "sqlite3": "~2.1.5",
