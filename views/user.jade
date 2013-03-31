@@ -83,6 +83,9 @@ block content
       if voted
         p You've already voted for this user. (Votes: #{user.data.votes.length}/#{locals.requiredVotes})
       else
-        button(name='approve', value='1').btn.btn-success Approve 
-          | #{user.data.votes.length}/#{locals.requiredVotes}
+        if user.data.votes.length < locals.requiredVotes - 1
+          button(name='approve', value='1').btn.btn-success Approve 
+            | #{user.data.votes.length}/#{locals.requiredVotes}
+        else
+          button(name='approve', value='1').btn.btn-success Grant Membership
       button(name='reject', value='1').btn.btn-danger Reject
