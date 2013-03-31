@@ -5,9 +5,19 @@ block content
   if !loggedInUser.paidUntil || loggedInUser.paidUntil.getFullYear() < 2013
     p.text-error We have received no subscription payments from you yet (payments may take
       |  a couple of days to show up). Please set up a standing order to:
-    p Sort code: ..-..-..
-      br
-      | Account number: .... ....
+    table.table.table-bordered(style='width: auto')
+      tr
+        th Payee name
+        td So Make It Ltd.
+      tr
+        th Sort code
+        td ..-..-..
+      tr
+        th Account number
+        td .... ....
+      tr
+        th Payment reference
+        td M#{pad(loggedInUser.id, 6)}
   else if +loggedInUser.paidUntil < +new Date()
     p.text-warning Your subscription is overdue. Please set up or check your standing order to:
     p Sort code: ..-..-..
