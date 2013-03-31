@@ -73,7 +73,15 @@ app.configure ->
   app.set 'views', __dirname + '/views'
   app.set 'view engine', 'jade'
   app.use express.favicon(path.join(__dirname, 'public', 'img', 'favicon.png'))
-  app.use express.logger('dev')
+  if process.env.NODE_ENV is 'development'
+    app.use express.logger('dev')
+  else
+    try
+      fs.mkdirSync 'log'
+    logStream = fs.createWriteStream 'log/access.log', {flags: 'a', mode: 0o600}
+    app.use express.logger
+      stream: logStream
+      format: ':remote-addr - - [:date] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" - :response-time ms'
   app.use express.bodyParser()
   app.use express.methodOverride()
   app.use express.cookieParser(process.env.SECRET ? 'your secret here')

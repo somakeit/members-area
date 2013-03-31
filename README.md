@@ -33,6 +33,9 @@ TRUSTEES_ADDRESS=yours+trustees@gmail.com
 SERVER_ADDRESS=http://localhost:1337
 ```
 
+(Set `NODE_ENV` to `development` to get logging on the console/etc;
+`./run` does this for you.)
+
 ### Setup the database
 
 This will create a SQLite DB at `./db.sqlite` and apply the table models.
