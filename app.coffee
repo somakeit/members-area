@@ -12,6 +12,14 @@ winston = require 'winston'
 require './env'
 models = require './models'
 
+try
+  fs.mkdirSync 'log'
+
+winston.remove winston.transports.Console
+winston.add winston.transports.Console, timestamp: true, colorize: true
+winston.add winston.transports.File, {filename: "log/winston.log", maxsize: 50000000, maxFiles: 8, level: 'warn'}
+winston.handleExceptions new winston.transports.File {filename: 'log/crash.log'}
+
 app = express()
 
 user = require('./routes/user')(app)
@@ -75,9 +83,6 @@ app.configure ->
   app.set 'view engine', 'jade'
   app.use express.favicon(path.join(__dirname, 'public', 'img', 'favicon.png'))
 
-  try
-    fs.mkdirSync 'log'
-
   # Request logging
   logStream = fs.createWriteStream 'log/access.log', {flags: 'a', mode: 0o600}
   express.logger.format 'user', (req, res) ->
@@ -90,10 +95,6 @@ app.configure ->
     app.use express.logger('dev')
 
   # Winston logging
-  winston.remove winston.transports.Console
-  winston.add winston.transports.Console, timestamp: true, colorize: true
-  winston.add winston.transports.File, {filename: "log/winston.log", maxsize: 50000000, maxFiles: 8, level: 'warn'}
-  winston.handleExceptions new winston.transports.File {filename: 'log/crash.log'}
   app.use (req, res, next) ->
     req.winston = winston
     details =
@@ -155,26 +156,26 @@ listen = (port) ->
   http.createServer(app).listen port, ->
     if typeof port is 'string'
       fs.chmod port, '0666'
-    console.log "Express server listening on port " + port
+    winston.info "Express server listening on port " + port
 
 port = app.get('port')
 if typeof port is 'string'
   # Unix socket - see if it's in use
   socket = new net.Socket
   socket.on 'connect', ->
-    console.error "Socket in use"
+    winston.error "Socket in use"
     process.exit 1
   socket.on 'error', (err) ->
     if err?.code is 'ECONNREFUSED'
       # No-one's listening
       fs.unlink port, (err) ->
         if err
-          console.error "Couldn't delete old socket."
+          winston.error "Couldn't delete old socket."
           process.exit 1
-        console.log "Liberated unused socket."
+        winston.info "Liberated unused socket."
         listen port
     else
-      console.error "Socket '#{port}' in use? #{err}"
+      winston.error "Socket '#{port}' in use? #{err}"
       process.exit 1
   socket.connect port
 else

@@ -1,5 +1,6 @@
 fs = require 'fs'
 path = require 'path'
+winston = require 'winston'
 
 # Import the .env as if it were environmental variables
 try
@@ -22,9 +23,9 @@ unless process.env.SQLITE
 
 missing = (name for name in requiredEnvironmentalVars when !process.env[name]?)
 if missing.length
-  console.error "The following environmental variables are missing: #{missing.join(", ")}"
+  winston.error "The following environmental variables are missing: #{missing.join(", ")}"
   process.exit 1
 
 unless process.env.SERVER_ADDRESS.match /^http.*[^/]$/
-  console.error "Server address must not end in /"
+  winston.error "Server address must not end in /"
   process.exit 1

@@ -34,8 +34,8 @@ module.exports = (app) -> new class
       query = {where:""}
     r = req.User.findAll(query)
     r.error (err) ->
-      console.error "Error occurred listing users."
-      console.error err
+      req.error "Error occurred listing users."
+      req.error err
       response.render 'message', {title:"Error", text: "Unknown error occurred, please try again later."}
     r.success (models) ->
       users = []
@@ -220,12 +220,12 @@ module.exports = (app) -> new class
           r.success ->
             render()
           r.error (err) ->
-            console.error "Failed to update paidUntil"
-            console.error err
+            req.error "Failed to update paidUntil"
+            req.error err
             response.render 'message', {title: "Error", text: "Failed to update user paidUntil"}
         r.error (err) ->
-          console.error "Failed to create payment"
-          console.error err
+          req.error "Failed to create payment"
+          req.error err
           response.render 'message', {title: "Error", text: "Failed to create payment"}
       else
         render()
@@ -234,7 +234,7 @@ module.exports = (app) -> new class
     response.locals.userId = null
     response.locals.loggedInUser = null
     loggedIn = ->
-      console.log req.session
+      req.log req.session
       response.locals.userId = req.session?.userId
       response.locals.fullname = req.session?.fullname
       response.locals.admin = req.session?.admin
@@ -329,8 +329,8 @@ module.exports = (app) -> new class
 
           r = user.save()
           r.error (err) ->
-            console.error "Error saving validated user."
-            console.error err
+            req.error "Error saving validated user."
+            req.error err
             response.render 'message', {title: "Database issue", text: "Please try again later."}
           r.success ->
             if user.approved? and user.approved.getFullYear() > 2012
@@ -360,8 +360,8 @@ module.exports = (app) -> new class
                   """
               }, (err, res) ->
                 if err
-                  console.error "Error sending notification to trustees"
-                  console.error err
+                  req.error "Error sending notification to trustees"
+                  req.error err
                 success()
         else
           fail()
@@ -448,7 +448,7 @@ module.exports = (app) -> new class
               }, (err, res) ->
                 if err
                   response.render 'message', {title:"Error", text: "Failed to email you a password reset code. Sorry!"}
-                  console.error err
+                  req.error err
                 else
                   sent()
           else
@@ -550,14 +550,14 @@ module.exports = (app) -> new class
                 """
             }, (err, res) ->
               if err
-                console.error "Error sending registration email."
-                console.error err
+                req.error "Error sending registration email."
+                req.error err
                 response.render 'message', {title:"Error", text: "Failed to email you the email verification code! Email web @ somakeit.org.uk"}
               else
                 response.render 'registrationComplete', {title:"Registration complete", email: req.body.email, err: err}
           r.error (err) ->
-            console.error "Error registering user:"
-            console.error err
+            req.error "Error registering user:"
+            req.error err
             if err.code is 'ER_DUP_ENTRY'
               if err.message.match /'email'/
                 err.email = true
