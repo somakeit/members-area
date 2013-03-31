@@ -71,7 +71,7 @@ block content
               br
               small (YYYY-MM-DD)
             td
-              -dateString = formatDate(user.paidUntil && user.paidUntil.getFullYear() > 2012 ? user.paidUntil : new Date())
+              -dateString = formatDate(user.paidUntil && user.paidUntil.getFullYear() > 2012 ? user.paidUntil : user.approved)
               input(name='subscriptionFrom', value=dateString)
               if error && error.date
                 p.text-error Invalid date.
