@@ -207,14 +207,13 @@ module.exports = (app) -> new class
         to.setMonth to.getMonth() + duration
 
         entry =
-          user_id: user.id
           type: type
           amount: amount
           made: from
           subscriptionFrom: from
           subscriptionUntil: to
           data: JSON.stringify fromAdmin: true
-        r = req.Payment.create entry
+        r = user.addPayment entry
         r.success (payment) ->
           user.paidUntil = to
           r = user.save()
