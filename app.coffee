@@ -80,9 +80,11 @@ app.configure ->
 
   # Request logging
   logStream = fs.createWriteStream 'log/access.log', {flags: 'a', mode: 0o600}
+  express.logger.format 'user', (req, res) ->
+    return res.locals.loggedInUser?.id ? "-"
   app.use express.logger
     stream: logStream
-    format: ':remote-addr - - [:date] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" - :response-time ms'
+    format: ':remote-addr - - [:date] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" - :response-time ms (u::user)'
   if process.env.NODE_ENV is 'development'
     # Also log to console
     app.use express.logger('dev')
