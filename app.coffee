@@ -91,7 +91,8 @@ app.configure ->
     return res.locals.loggedInUser?.id ? "-"
   express.logger.token 'ips', (req, res) ->
     ips = req.ips.slice()
-    ips.unshift(req.ip)
+    if ips.indexOf(req.ip) is -1
+      ips.unshift(req.ip)
     return ips.join(",")
   app.use express.logger
     stream: logStream
