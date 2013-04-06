@@ -95,6 +95,9 @@ block content
               if error && error.duration
                 p.text-error Invalid duration - how did you manage that?
         button.btn.btn-warning(type='submit') Register payment
+  else if admin && user.data && user.data.rejected
+    h3 Approval status
+    p.text-warning User has been rejected, we're awaiting re-application.
   else if admin
     form(method="POST").approval
       input(type='hidden', name='form', value='approval')

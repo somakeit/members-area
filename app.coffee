@@ -133,6 +133,7 @@ app.configure 'development', ->
 app.all '/register', user.register
 app.all '/verify', user.verify
 app.all '/forgot', user.forgot
+app.all '/reapply', user.reapply
 
 # Logged in
 app.all '/', dashboard.index

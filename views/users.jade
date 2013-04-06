@@ -13,6 +13,8 @@ block content
             -className += " neverpaid"
           else if +user.paidUntil < +new Date()
             -className += " overdue"
+        if user.data && user.data.rejected
+          -className += " rejected"
         if user.data && user.data.validationCode && user.data.email == user.email
           -className += " unverified"
       li(class=className)
@@ -25,7 +27,9 @@ block content
                 small  (overdue for #{Math.floor((+new Date() - user.paidUntil)/(24*60*60*1000))} days)
         else if admin
           a(href="/user/#{user.id}") #{user.fullname} (#{user.username})
-            if user.data && user.data.validationCode && user.data.email == user.email
+            if user.data && user.data.rejected
+              small  (rejected)
+            else if user.data && user.data.validationCode && user.data.email == user.email
               small  (unverified)
             else
               small  (pending approval)

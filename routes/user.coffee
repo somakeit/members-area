@@ -27,7 +27,7 @@ disallowedUsernameRegexps = [
   /^(admin|join|social|info|queries)$/i
 ]
 
-module.exports = (app) -> new class
+module.exports = (app) -> self = new class
   list: (req, response, next) ->
     query = {where:"approved IS NOT NULL AND approved > '2013-01-01'"}
     if req.session.admin
@@ -66,12 +66,19 @@ module.exports = (app) -> new class
           response.render 'user', {title: user.fullname, user:u, voted: voted, error: error, payments: payments}
         if response.locals.loggedInUser.admin
           user.getPayments().done (err, payments) ->
+            payments ?= []
             payments.sort (a, b) -> return +b.made - a.made
             gotPayments(payments)
         else
           gotPayments(null)
       if req.method is 'POST' and req.session.admin and req.body.form is 'approval'
         if req.body.reject is '1'
+          data = {}
+          try
+            data = JSON.parse user.data
+          if data.rejected
+            render()
+            return
           gmail.sendMail {
             from: "So Make It <web@somakeit.org.uk>"
             to: user.email
@@ -88,7 +95,9 @@ module.exports = (app) -> new class
               #{req.body.message}
               ---
 
-              Your account has been deleted from our server - please reapply once you've fixed the issues stated above.
+              You can log in below to reapply:
+
+              #{process.env.SERVER_ADDRESS}/reapply
 
               Kind regards,
 
@@ -98,12 +107,17 @@ module.exports = (app) -> new class
               if err
                 response.render 'message', {title: "Error", text: "Error sending email: #{err}"}
                 return
-              r = user.destroy()
+              data.rejected = true
+              data.rejectedBy = req.session.userId
+              data.rejectedReason = req.body.message
+              user.data = JSON.stringify data
+              r = user.save()
               r.success ->
-                user = null
-                response.render 'message', {title: "User rejected", text: "Entry deleted from DB."}
+                response.render 'message', {title: "User rejected", text: "We've sent them an email with your message"}
               r.error (err) ->
-                response.render 'message', {title: "Error", text: "Failed to delete user #{user.id} from the DB."}
+                req.error "Error rejecting user:"
+                req.error err
+                response.render 'message', {title: "Error", text: "Failed to reject user #{user.id}."}
         else if req.body.approve is '1'
           data = {}
           try
@@ -249,6 +263,103 @@ module.exports = (app) -> new class
       req.session.destroy()
     response.redirect 307, "/"
 
+  reapply: (req, response, next) ->
+    if req.session?.userId?
+      response.redirect '/'
+      return
+    render = (opts = {}) ->
+      opts.title = "Reapply"
+      opts.formName = 'reapply'
+      opts.data ?= req.body
+      opts.err ?= null
+      response.render 'login', opts
+    if req.method is 'GET'
+      render()
+      return
+    # XXX: Seriously Benjie, copy and paste?! What happened to DRY?!
+    else if req.method is 'POST' and req.body.form is 'reapply' and req.body.email?
+      # Check data
+      {email, password} = req.body
+      if email.match /@/
+        query = where:{email:email}
+      else
+        query = where:{username:email}
+      r = req.User.find(query)
+      r.error (err) ->
+        return render({data:req.body,err})
+      r.success (user) ->
+        if !user
+          return render {data:req.body,err:new Error()}
+        bcrypt.compare password, user.password, (err, res) ->
+          if err or !res
+            return render {data:req.body,err:new Error()}
+          data = {}
+          try
+            data = JSON.parse user.data
+          if (user.approved? and user.approved.getFullYear() > 2012) or !data?.rejected
+            response.redirect '/'
+            return
+          u = user.toJSON()
+          u.data = data
+          formData = req.body
+          formData.fullname ?= user.fullname
+          formData.address ?= user.address
+          error = null
+          if req.body.reapply
+            error = new Error()
+            # XXX: Benjie: more copy pasting?! What's wrong with you?!
+            unless /.+ .*/.test req.body.fullname ? ""
+              error.fullname = true
+            unless req.body.address?.length > 8
+              error.address = true
+            unless req.body.terms is 'on'
+              error.terms = true
+            if !error.fullname and !error.address and !error.terms
+              # Save reapplication
+              user.fullname = req.body.fullname
+              user.address = req.body.address
+              delete data.rejected
+              delete data.rejectedBy
+              delete data.rejectedReason
+              user.data = JSON.stringify data
+              r = user.save()
+              r.success (user) ->
+                approveURL = "#{process.env.SERVER_ADDRESS}/user/#{user.id}"
+                gmail.sendMail {
+                  from: "So Make It <web@somakeit.org.uk>"
+                  to: process.env.APPROVAL_TEAM_EMAIL
+                  subject: "SoMakeIt[Reapply]: #{user.fullname} (#{user.email})"
+                  body: """
+                    User reapplied:
+
+                      Email: #{user.email}
+                      Username: #{user.username}
+                      Name: #{user.fullname}
+                      Address: #{("\n"+user.address).replace(/\n/g, "\n    ")}
+
+                    Approve or reject them here:
+                    #{approveURL}
+
+                    Thanks,
+
+                    The So Make It web team
+                    """
+                }, (err, res) ->
+                  if err
+                    req.error "Error sending notification to trustees"
+                    req.error err
+                  response.render 'message', {title: "Reapplication accepted", text: "Our application team will review your request shortly."}
+              r.error (err) ->
+                req.error "Error saving user."
+                req.error err
+                response.render 'message', {title: "Error", text: "Couldn't update your data."}
+                return
+              return
+
+          response.render 'reapply', {user: u, title: 'reapply', err:error, data:formData}
+    else
+      next()
+
   auth: (req, response, next) ->
     response.locals.userId = null
     response.locals.loggedInUser = null
@@ -266,7 +377,7 @@ module.exports = (app) -> new class
           return next()
       else
         return next()
-    if req.session.userId? or ['/register', '/verify', '/forgot'].indexOf(req.path) isnt -1
+    if req.session.userId? or ['/register', '/verify', '/forgot', '/reapply'].indexOf(req.path) isnt -1
       return loggedIn()
     render = (opts = {}) ->
       opts.err ?= null
@@ -290,12 +401,18 @@ module.exports = (app) -> new class
           if err or !res
             return render {data:req.body,err:new Error()}
           else
+            data = {}
+            try
+              data = JSON.parse user.data
             if user.approved? and user.approved.getFullYear() > 2012
               req.session.userId = user.id
               req.session.fullname = user.fullname
               req.session.username = user.username
               req.session.admin = user.admin
               return loggedIn()
+            else if data?.rejected
+              req.body.form = 'reapply'
+              self.reapply(req, response, next)
             else
               subject = "Pending approval: account ##{user.id}"
               response.render 'message',
@@ -368,7 +485,6 @@ module.exports = (app) -> new class
                     Username: #{user.username}
                     Name: #{user.fullname}
                     Address: #{("\n"+user.address).replace(/\n/g, "\n    ")}
-                    Wiki: #{if user.wikiname then "http://wiki.somakeit.org.uk/wiki/User:#{user.wikiname}" else "nope"}
 
                   Approve or reject them here:
                   #{approveURL}

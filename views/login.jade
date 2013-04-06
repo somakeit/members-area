@@ -8,7 +8,7 @@ block body
         fieldset
           - var controlGroupClass = (!!err ? "error" : "")
           .control-group(class=controlGroupClass)
-            input(type='hidden', name='form', value='login')
+            input(type='hidden', name='form', value=(typeof formName === 'undefined' ? 'login' : formName))
             .clearfix
               - var email = data.email || ""
               input.text(type='text', name='email', placeholder='Username or email', value=email)
