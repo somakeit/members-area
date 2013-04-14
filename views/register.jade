@@ -40,6 +40,12 @@ block body
             strong
               a(href="http://www.legislation.gov.uk/ukpga/2006/46/part/8/chapter/2/crossheading/general") UK law
               |  requires you to provide your real name and address to become a member of So Make It Ltd.
+
+          // Antispam
+          .control-group.sdfsdfsdf
+            label Fill this field in if you're not a human:
+            input.text(type='text', name='url', placeholder='Required')
+
           - each field in ['Full Name', 'Email', 'Username']
             - item = field.replace(/ /,"").toLowerCase()
             - controlGroupClass = (err && err[item] ? "error" : "")
@@ -84,6 +90,11 @@ block body
               |  and 
               a(href="http://wiki.somakeit.org.uk/wiki/Rules") rules
               |.
+
+          if err && err.antispam
+            p.text-error You tripped our robot alarm (we're not convinced you're human). Please contact 
+              a(href="mailto:benjie@somakeit.org.uk?subject=Robot%20Alarm") Benjie
+              | .
 
           if err && err.unknown
             p.text-error An unknown error occurred. Please contact 

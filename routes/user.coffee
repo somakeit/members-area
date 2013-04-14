@@ -626,6 +626,8 @@ module.exports = (app) -> self = new class
       response.render 'register', opts
     if req.method is 'POST' and req.body.form is 'register'
       error = new Error()
+      unless req.body.url?.length is 0
+        error.antispam = true
       unless /^[^@\s,"]+@[^@\s,]+\.[^@\s,]+$/.test req.body.email ? ""
         error.email = true
       unless /.+ .*/.test req.body.fullname ? ""
@@ -644,7 +646,7 @@ module.exports = (app) -> self = new class
       unless req.body.password is req.body.password2
         error.password = true
         error.passwordsdontmatch = true
-      if error.email or error.fullname or error.address or error.terms or error.password or error.username
+      if error.email or error.fullname or error.address or error.terms or error.password or error.username or error.antispam
         render(err:error, data: req.body)
       else
         # Attempt registration
