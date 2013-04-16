@@ -25,7 +25,7 @@ block everything
             td(colspan=4)
               h3 Register of Members
               -var now = new Date()
-              p.legal #{users.length} members total (#{formatDate(now)} #{pad(now.getHours())}:#{pad(now.getMinutes())})
+              p #{users.length} members total (#{formatDate(now)} #{pad(now.getHours())}:#{pad(now.getMinutes())})
         tr
           th #
           th Name
