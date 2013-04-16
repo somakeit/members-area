@@ -27,10 +27,10 @@ block everything
               -var now = new Date()
               p #{users.length} members total (#{formatDate(now)} #{pad(now.getHours())}:#{pad(now.getMinutes())})
         tr
-          th #
-          th Name
-          th Date approved
-          th Address
+          th.number #
+          th.name Name
+          th.approved Approved
+          th.address Address
         each user, i in users
           tr
             td= i+1
