@@ -1,0 +1,41 @@
+extends layout
+
+block everything
+  .registerOfMembers
+    .letterhead
+      img.logo(src="/img/logo.png")
+      .details
+        .companyName
+          h4 So Make It Ltd.
+          p.legal Registered in England and Wales,
+            br
+            | company number 08442741.
+        .address
+          p 6 Irving Road
+          p Southampton
+          p SO16 4DZ
+        .contact
+          p Tel: +44 (0) 7773 679729
+          p Email: trustees@somakeit.org.uk
+          p Web: http://www.somakeit.org.uk/
+    .main
+      table.table
+        thead
+          tr
+            td(colspan=4)
+              h3 Register of Members
+              -var now = new Date()
+              p.legal #{users.length} members total (#{formatDate(now)} #{pad(now.getHours())}:#{pad(now.getMinutes())})
+        tr
+          th #
+          th Name
+          th Date approved
+          th Address
+        each user, i in users
+          tr
+            td= i+1
+            td= user.fullname
+            td= formatDate(user.approved)
+            td= user.address
+      .summary Total: #{users.length} members
+  script window.print()

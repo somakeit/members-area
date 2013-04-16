@@ -709,3 +709,22 @@ module.exports = (app) -> self = new class
 
 
     render()
+
+  viewRegister: (req, response, next) ->
+    return next() unless req.session.admin
+    query =
+      where: "approved IS NOT NULL AND approved > '2013-01-01'"
+      order: "approved ASC"
+    r = req.User.findAll(query)
+    r.error (err) ->
+      req.error "Error occurred listing users."
+      req.error err
+      response.render 'message', {title:"Error", text: "Unknown error occurred, please try again later."}
+    r.success (models) ->
+      users = []
+      for model in models
+        user = model.toJSON()
+        try
+          user.data = JSON.parse user.data
+        users.push user
+      response.render 'register-of-members', {title: "Register of Members", users:users}

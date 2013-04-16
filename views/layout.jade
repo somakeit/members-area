@@ -12,110 +12,111 @@ html
     script(src='/js/jquery-migrate.min.js')
     script(src='/js/bootstrap.min.js')
   body
-    .navbar.navbar-inverse.navbar-static-top
-      .navbar-inner
-        .container
-          // Responsive Navbar Part 1: Button for triggering responsive navbar (not covered in tutorial). Include responsive CSS to utilize.
-          a.btn.btn-navbar(data-toggle='collapse', data-target='.nav-collapse')
-            span.icon-bar
-            span.icon-bar
-            span.icon-bar
-          a.brand(href='/') So Make It
-          // Responsive Navbar Part 2: Place all navbar contents you want collapsed withing .navbar-collapse.collapse.
-          .nav-collapse.collapse
-            - var active
-            ul(class="nav members")
-              li
-                a(href='http://www.somakeit.org.uk/') Home
-              li
-                a(href='http://www.somakeit.org.uk/trustees/') Trustees
-              li
-                a(href='http://www.somakeit.org.uk/groups/') Groups
-              li
-                a(href='http://www.somakeit.org.uk/contact/') Contact/Visit
-              li
-                a(href='http://www.somakeit.org.uk/sponsors/') Sponsors
-              li
-                a(href='http://wiki.somakeit.org.uk/') Wiki
-            ul.nav.pull-right
-              if loggedInUser
-                li.active.dropdown
-                  a.dropdown-toggle(data-toggle="dropdown", data-target="#", href="/") #{loggedInUser.fullname} 
-                    b.caret
-                  ul.dropdown-menu
-                    li
-                      a(href='/') Dashboard
-                    li
-                      a(href='/account') My Account
-                    li.divider
-                    li
-                      form(id="logoutform", action="/logout", method="POST")
-                        input(type="hidden", name="form", value="logout")
-                      a(href='/logout', onclick="document.getElementById('logoutform').submit(); return false") Log out
-              else
-                li.active
-                  a(href='/') Members area
-    #main.container
-      block body
-        if userId
-          .row
-            .span3
-              ul.nav.nav-list
-                li.nav-header #{fullname}
+    block everything
+      .navbar.navbar-inverse.navbar-static-top
+        .navbar-inner
+          .container
+            // Responsive Navbar Part 1: Button for triggering responsive navbar (not covered in tutorial). Include responsive CSS to utilize.
+            a.btn.btn-navbar(data-toggle='collapse', data-target='.nav-collapse')
+              span.icon-bar
+              span.icon-bar
+              span.icon-bar
+            a.brand(href='/') So Make It
+            // Responsive Navbar Part 2: Place all navbar contents you want collapsed withing .navbar-collapse.collapse.
+            .nav-collapse.collapse
+              - var active
+              ul(class="nav members")
+                li
+                  a(href='http://www.somakeit.org.uk/') Home
+                li
+                  a(href='http://www.somakeit.org.uk/trustees/') Trustees
+                li
+                  a(href='http://www.somakeit.org.uk/groups/') Groups
+                li
+                  a(href='http://www.somakeit.org.uk/contact/') Contact/Visit
+                li
+                  a(href='http://www.somakeit.org.uk/sponsors/') Sponsors
+                li
+                  a(href='http://wiki.somakeit.org.uk/') Wiki
+              ul.nav.pull-right
+                if loggedInUser
+                  li.active.dropdown
+                    a.dropdown-toggle(data-toggle="dropdown", data-target="#", href="/") #{loggedInUser.fullname} 
+                      b.caret
+                    ul.dropdown-menu
+                      li
+                        a(href='/') Dashboard
+                      li
+                        a(href='/account') My Account
+                      li.divider
+                      li
+                        form(id="logoutform", action="/logout", method="POST")
+                          input(type="hidden", name="form", value="logout")
+                        a(href='/logout', onclick="document.getElementById('logoutform').submit(); return false") Log out
+                else
+                  li.active
+                    a(href='/') Members area
+      #main.container
+        block body
+          if userId
+            .row
+              .span3
+                ul.nav.nav-list
+                  li.nav-header #{fullname}
 
-                -templates = ['dashboard']
-                li(class=(templates.indexOf(templateName) != -1 ?  'active' : ''))
-                  a(href="/") Dashboard
+                  -templates = ['dashboard']
+                  li(class=(templates.indexOf(templateName) != -1 ?  'active' : ''))
+                    a(href="/") Dashboard
 
-                -templates = ['account']
-                li(class=(templates.indexOf(templateName) != -1 ?  'active' : ''))
-                  a(href="/account") Account
+                  -templates = ['account']
+                  li(class=(templates.indexOf(templateName) != -1 ?  'active' : ''))
+                    a(href="/account") Account
 
-                -templates = ['subscription']
-                -className = (templates.indexOf(templateName) != -1 ?  'active' : '')
-                if !loggedInUser.paidUntil || loggedInUser.paidUntil.getTime() <= new Date().getTime()
-                  -className += " warning"
-                li(class=className)
-                  a(href="/subscription") Subscription
+                  -templates = ['subscription']
+                  -className = (templates.indexOf(templateName) != -1 ?  'active' : '')
+                  if !loggedInUser.paidUntil || loggedInUser.paidUntil.getTime() <= new Date().getTime()
+                    -className += " warning"
+                  li(class=className)
+                    a(href="/subscription") Subscription
 
-                -templates = ['users', 'user']
-                li(class=(templates.indexOf(templateName) != -1 ?  'active' : ''))
-                  a(href="/user") Member list
+                  -templates = ['users', 'user']
+                  li(class=(templates.indexOf(templateName) != -1 ?  'active' : ''))
+                    a(href="/user") Member list
 
-                if admin
-                  li.nav-header Administration
-                    -templates = ['admin']
-                    li(class=(templates.indexOf(templateName) != -1 ?  'active' : ''))
-                      a(href="/admin") Owt yet
+                  if admin
+                    li.nav-header Administration
+                      -templates = ['admin']
+                      li(class=(templates.indexOf(templateName) != -1 ?  'active' : ''))
+                        a(href="/viewRegister") Register of members
 
-            .span9.main
-              block content
-        else
-          .row
-            .span12
-              block content
+              .span9.main
+                block content
+          else
+            .row
+              .span12
+                block content
 
-    if false
-      li.nav-header Not logged in
+      if false
+        li.nav-header Not logged in
 
-      -templates = ['login']
-      li(class=(templates.indexOf(templateName) != -1 ?  'active' : ''))
-        a(href="/") Log in
+        -templates = ['login']
+        li(class=(templates.indexOf(templateName) != -1 ?  'active' : ''))
+          a(href="/") Log in
 
-      -templates = ['register','registrationComplete']
-      li(class=(templates.indexOf(templateName) != -1 ?  'active' : ''))
-        a(href="/register") Register
+        -templates = ['register','registrationComplete']
+        li(class=(templates.indexOf(templateName) != -1 ?  'active' : ''))
+          a(href="/register") Register
 
-      -templates = ['forgot']
-      li(class=(templates.indexOf(templateName) != -1 ?  'active' : ''))
-        a(href="/forgot") Forgot password
+        -templates = ['forgot']
+        li(class=(templates.indexOf(templateName) != -1 ?  'active' : ''))
+          a(href="/forgot") Forgot password
 
-    .container
-      footer
-        block footer
-          p.backtotop
-            a(href='#') Back to top
-          p
-            | &copy; #{ new Date().getFullYear() } So Make It Ltd.
-          p.legal
-            | A not-for-profit company limited by guarantee, registered in England and Wales with company number: 08442741. Registered address: 6 Irving Road, SO16 4DZ.
+      .container
+        footer
+          block footer
+            p.backtotop
+              a(href='#') Back to top
+            p
+              | &copy; #{ new Date().getFullYear() } So Make It Ltd.
+            p.legal
+              | A not-for-profit company limited by guarantee, registered in England and Wales with company number: 08442741. Registered address: 6 Irving Road, SO16 4DZ.

@@ -141,6 +141,7 @@ app.all '/logout', user.logout
 app.all '/user', user.list
 app.all '/user/:userId', user.view
 app.all '/subscription', subscription.index
+app.all '/viewRegister', user.viewRegister
 
 handle501 = (req, res) ->
   res.statusCode = 501
