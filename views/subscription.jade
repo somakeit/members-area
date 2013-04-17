@@ -11,18 +11,18 @@ block content
         td So Make It Ltd.
       tr
         th Sort code
-        td ..-..-..
+        td #{process.env.SORTCODE}
       tr
         th Account number
-        td .... ....
+        td #{process.env.ACCOUNTNUMBER}
       tr
         th Payment reference
         td M#{pad(loggedInUser.id, 6)}
   else if +loggedInUser.paidUntil < +new Date()
     p.text-warning Your subscription is overdue. Please set up or check your standing order to:
-    p Sort code: ..-..-..
+    p Sort code: #{process.env.SORTCODE}
       br
-      | Account number: .... ....
+      | Account number: ${process.env.ACCOUNTNUMBER}
   else
     p.text-success Your subscription is up to date - thanks very much!
     p Your next payment is due: 
