@@ -78,7 +78,7 @@ block content
             td
               input(name='amount', value='5')
               if error && error.amount
-                p.txt-error Invalid amount - must be at least £5.
+                p.txt-error Invalid amount - must be at least £5 (less any PayPal/etc fees - actual minimum is £4.50).
           tr
             th Period start
               br
