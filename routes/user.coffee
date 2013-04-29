@@ -175,9 +175,10 @@ module.exports = (app) -> self = new class
         error.made = true if !made
         error.subscriptionFrom = true if !subscriptionFrom
 
-        if type isnt 'CASH'
+        if ['CASH', 'SO', 'PAYPAL'].indexOf(type) is -1
           error.type = true
           error.invalidType = type
+          req.error "Invalid payment type: #{type}"
 
         amount = parseInt(100*parseFloat(amount), 10)
         if amount < 500

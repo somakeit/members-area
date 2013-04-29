@@ -38,11 +38,23 @@ block content
                 td= entry.f(payment[key], payment)
       form(method='POST')
         input(type='hidden', name='form', value='payment')
-        input(type='hidden', name='type', value='CASH')
-        h4 Register a cash payment
+        h4 Register a payment
         p.text-info
           strong The form below has sensible defaults, please ensure you understand what they mean if you change them.
         table.table.table-bordered(style='width:auto')
+          tr
+            th Payment type
+            td
+              select(name='type')
+                option(value='CASH', selected) CASH
+                option(value='SO') Standing Order
+                option(value='PAYPAL') PayPal
+                option(value='DD') Direct Debit
+              if error && error.type
+                if error.invalidType
+                  p.text-error Invalid type of payment: '#{error.invalidType}'.
+                else
+                  p.text-error Unknown error with type.
           tr
             th Payment date
               br
