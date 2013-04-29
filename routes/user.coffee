@@ -181,7 +181,7 @@ module.exports = (app) -> self = new class
           req.error "Invalid payment type: #{type}"
 
         amount = parseInt(100*parseFloat(amount), 10)
-        if amount < 500
+        if amount < 450
           error.amount = true
           error.amountTooSmall = true
 
