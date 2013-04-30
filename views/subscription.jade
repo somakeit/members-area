@@ -11,7 +11,7 @@ block content
     p.text-success Your subscription is up to date - thanks very much!
     p Your next payment is due: 
       strong= formatDate(loggedInUser.paidUntil)
-  h3 Payments
+  h3 Payments received
   if err
     p.text-error Error loading payments from DB.
   else
@@ -45,3 +45,83 @@ block content
       th Payment reference
       td M#{pad(loggedInUser.id, 6)}
   p.muted Note: the payment reference is specific to your account.
+
+  h3 GoCardless
+  p GoCardless are the next cheapest way to send us money after standing orders/cash. They charge just 1% per transaction (e.g. 20p for every £20) and so are very affordable.
+  p.text-info GoCardless collect money via Direct Debit, and so your payments are covered by the Direct Debit Guarantee.
+  p To get started, just enter your preferred monthly payment amount below:
+  form(method='POST',target="/gocardless")
+    - var startDate = loggedInUser.paidUntil && +loggedInUser.paidUntil.getFullYear() > 2012 ? loggedInUser.paidUntil : loggedInUser.approved;
+    - var firstPayment = new Date(startDate.getTime())
+    - var now = +new Date();
+    - while (+firstPayment < now) {firstPayment.setMonth(firstPayment.getMonth()+1);}
+    - var monthsOwed = Math.max(0, Math.round((+firstPayment - startDate)/(24*60*60*1000*30.4))); // Don't look at me like that. This should never be more than a couple of months!
+    input(type='hidden', name='form', value='gocardless')
+    table.table.table-bordered(style='width:auto')
+      tr
+        th Monthly amount, £
+          br
+          small First payment: #{formatDate(firstPayment)}
+        td
+          input(type='text', name='monthly', value="30.31", id="gocardless_amount")
+          br
+          small (After the GoCardless fee, this will be £<strong id='gocardless_after'></strong>)
+      tr
+        th Initial fee, £
+          br
+          if monthsOwed > 0
+            small To cover the #{monthsOwed} month period #{formatDate(startDate)} to #{formatDate(firstPayment)}
+          else
+            small One-off donation, completely optional.
+        td
+          input(type='text', name='initial', value="", id="gocardless_setup")
+          br
+          small (After the GoCardless fee, this will be £<strong id='gocardless_after2'></strong>)
+    button.btn.btn-success.btn-large(type='submit') Set up payments
+  script(type='text/javascript')
+    (function() {
+      var gocardless_amount = document.getElementById('gocardless_amount');
+      var gocardless_setup = document.getElementById('gocardless_setup');
+      var gocardless_after = document.getElementById('gocardless_after');
+      var gocardless_after2 = document.getElementById('gocardless_after2');
+      var unmodified = true;
+      gocardless_amount.addEventListener('change', update_gocardless_after, false);
+      gocardless_amount.addEventListener('keyup', update_gocardless_after, false);
+      gocardless_setup.addEventListener('change', update_gocardless_after2, false);
+      gocardless_setup.addEventListener('keyup', update_gocardless_after2, false);
+      function pad(n) {
+        n = "" + n;
+        if (n.length < 2) {
+          n = "0" + n;
+        }
+        return n;
+      }
+      function update_gocardless_after() {
+        if (unmodified) {
+          var v = parseFloat(gocardless_amount.value);
+          if (!isNaN(v)) {
+            v = Math.round(#{monthsOwed} * v * 100);
+            v = "" + Math.floor(v/100) + "." + pad(v % 100);
+            gocardless_setup.value = v;
+            update_gocardless_after2();
+          }
+        }
+        return update_gocardless_a(gocardless_amount, gocardless_after);
+      }
+      function update_gocardless_after2(e) {
+        if (e) {
+          unmodified = false;
+        }
+        return update_gocardless_a(gocardless_setup, gocardless_after2);
+      }
+      function update_gocardless_a(amount, after) {
+        var amount = parseFloat(amount.value);
+        if (!isNaN(amount)) {
+          amount = Math.floor(100 * amount * 0.99);
+          amount = "" + Math.floor(amount/100) + "." + pad(amount % 100);
+          after.textContent = amount;
+        }
+      }
+      update_gocardless_after();
+      update_gocardless_after2();
+    })();
