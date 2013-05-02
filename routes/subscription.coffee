@@ -1,9 +1,13 @@
 module.exports = (app) -> new class
   index: (req, response) ->
     response.locals.loggedInUser.getPayments().done (err, payments) ->
-      payments.sort (a, b) -> return +b.made - a.made
-      response.render 'subscription', {title: 'Subscription', payments: payments, err: err, gocardlessErr: null}
+      if !err
+        payments.sort (a, b) -> return +b.made - a.made
+      else
+        req.error err
+      response.render 'subscription', {title: 'Subscription', payments: payments, err: err, gocardlessErr: null, data: null}
   gocardless: (req, response) ->
+    loggedInUser = response.locals.loggedInUser
     render = (data, err) ->
       return response.render 'subscription-gocardless', {data: data, title: 'GoCardless', gocardlessErr: err}
     if req.method is 'POST' and req.body.form is 'gocardless'
@@ -37,6 +41,43 @@ module.exports = (app) -> new class
       if err.date or err.monthly or err.initial
         return render(req.body, err)
       # Go talk to GoCardless
-      response.render 'message', {title: "Unimplemented", text: "Unimplemented (£#{monthly}/mo starting #{response.locals.formatDate(date)} plus initial £#{initial}"}
+      url = "https://sandbox.gocardless.com/connect/subscriptions/new"
+      letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/"
+      now = new Date()
+      nonce = ""
+      for i in [0...16]
+        nonce += letters.substr(Math.floor(Math.random()*letters.length), 1)
+      tmp = loggedInUser.fullname.split(" ")
+      firstName = tmp[0]
+      lastName = tmp[tmp.length-1]
+      tmp = loggedInUser.address.match /[A-Z]{2}[0-9]{1,2}\s*[0-9][A-Z]{2}/
+      if tmp
+        postcode = tmp[0]
+      address1 = loggedInUser.address
+      if postcode
+        address1 = address1.replace(postcode, "")
+      pad = response.locals.pad
+      parameters =
+        client_id: process.env.GOCARDLESS_APP_ID
+        nonce: nonce
+        timestamp: "#{response.locals.formatDate(now)}T#{pad(now.getUTCHours())}:#{pad(now.getUTCMinutes())}:00Z"
+        subscription:
+          amount: monthly
+          merchant_id: process.env.GOCARDLESS_MERCHANT
+          interval_length: 1
+          interval_unit: 'month'
+          name: "M#{response.locals.pad(loggedInUser.id, 6)}"
+          description: "So Make It Subscription"
+          start_at: response.locals.formatDate(date) # ISO8601
+          setup_fee: initial
+        user:
+          first_name: firstName
+          last_name: lastName
+          email: loggedInUser.email
+          account_name: "So Make It"
+          billing_address1: address1
+          billing_postcode: postcode
+
+      response.render 'message', {title: "Unimplemented", text: "Unimplemented (£#{monthly}/mo starting #{response.locals.formatDate(date)} plus initial £#{initial}. #{JSON.stringify(parameters)}"}
     else
       render()

@@ -66,7 +66,7 @@ block content
         tr
           th First monthly payment
             br
-            small Payments will come out on or around this day each month
+            small Payments will come out on or around this day each month.
           td
             input(type='text', name='date', value="#{(data && data.date) || formatDate(firstPayment)}")
             br
@@ -76,10 +76,8 @@ block content
               p.text-error= gocardlessErr.date
         tr
           th Monthly amount, £
-            br
-            small First payment: #{formatDate(firstPayment)}
           td
-            input(type='text', name='monthly', value="#{(data && data.monthly) || 30.31}", id="gocardless_amount")
+            input(type='text', name='monthly', value="#{(data && data.monthly) || 25.26}", id="gocardless_amount")
             br
             small (After the GoCardless fee, this will be £<strong id='gocardless_after'></strong>)
             if gocardlessErr && gocardlessErr.monthly
