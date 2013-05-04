@@ -44,12 +44,7 @@ module.exports = (app) -> new class
       if err.date or err.monthly or err.initial
         return render(req.body, err)
       # Go talk to GoCardless
-      url = "https://sandbox.gocardless.com/connect/subscriptions/new"
-      letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/"
       now = new Date()
-      nonce = ""
-      for i in [0...16]
-        nonce += letters.substr(Math.floor(Math.random()*letters.length), 1)
       tmp = loggedInUser.fullname.split(" ")
       firstName = tmp[0]
       lastName = tmp[tmp.length-1]
