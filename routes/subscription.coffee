@@ -1,3 +1,6 @@
+gocardlessMod = require '../gocardless-client'
+gocardlessClient = gocardlessMod.client
+
 module.exports = (app) -> new class
   index: (req, response) ->
     response.locals.loggedInUser.getPayments().done (err, payments) ->
@@ -58,26 +61,23 @@ module.exports = (app) -> new class
         address1 = address1.replace(postcode, "")
       pad = response.locals.pad
       parameters =
-        client_id: process.env.GOCARDLESS_APP_ID
-        nonce: nonce
-        timestamp: "#{response.locals.formatDate(now)}T#{pad(now.getUTCHours())}:#{pad(now.getUTCMinutes())}:00Z"
-        subscription:
-          amount: monthly
-          merchant_id: process.env.GOCARDLESS_MERCHANT
-          interval_length: 1
-          interval_unit: 'month'
-          name: "M#{response.locals.pad(loggedInUser.id, 6)}"
-          description: "So Make It Subscription"
-          start_at: response.locals.formatDate(date) # ISO8601
-          setup_fee: initial
+        name: "M#{response.locals.pad(loggedInUser.id, 6)}"
+        description: "So Make It Subscription"
+        #interval_count
+        start_at: date
+        #expires_at
+        #redirect_uri
+        #cancel_uri
+        #state
         user:
           first_name: firstName
           last_name: lastName
           email: loggedInUser.email
-          account_name: "So Make It"
+          account_name: loggedInUser.fullname
           billing_address1: address1
           billing_postcode: postcode
-
-      response.render 'message', {title: "Unimplemented", text: "Unimplemented (£#{monthly}/mo starting #{response.locals.formatDate(date)} plus initial £#{initial}. #{JSON.stringify(parameters)}"}
+        setup_fee: initial
+      url = gocardlessClient.newSubscriptionUrl monthly, 1, 'month', parameters
+      response.redirect url
     else
       render()
