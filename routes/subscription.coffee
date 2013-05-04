@@ -79,5 +79,13 @@ module.exports = (app) -> new class
         setup_fee: initial
       url = gocardlessClient.newSubscriptionUrl monthly, 1, 'month', parameters
       response.redirect url
+    else if req.query.signature
+      # We've got a response!
+      console.log JSON.stringify req.query
+      gocardlessClient.confirmResource req.query, (err, res) ->
+        if err
+          return response.render 'message', {title:"Error", text: "We couldn't complete the transaction, GoCardless returned an error: '#{err.message}'"}
+        else
+          response.render 'message', {title:"Done", text: "Thanks for being super-awesome, you super-awesome person you!"}
     else
       render()
