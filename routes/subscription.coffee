@@ -24,7 +24,10 @@ module.exports = (app) -> new class
         if isNaN(yyyy) or isNaN(mm) or isNaN(dd)
           err.date = "Invalid date"
         else
-          date = new Date(yyyy, mm-1, dd)
+          date = new Date()
+          date.setYear yyyy
+          date.setMonth mm-1
+          date.setDate dd
         tomorrow = new Date()
         tomorrow.setHours(0)
         tomorrow.setMinutes(0)
