@@ -119,8 +119,12 @@ block content
         var unmodified = #{!!data ? "false" : "true"};
         gocardless_monthly.addEventListener('change', update_gocardless_monthly_inc, false);
         gocardless_monthly.addEventListener('keyup', update_gocardless_monthly_inc, false);
+        gocardless_initial.addEventListener('change', make_modified, false);
         gocardless_initial.addEventListener('change', update_gocardless_initial_inc, false);
         gocardless_initial.addEventListener('keyup', update_gocardless_initial_inc, false);
+        function make_modified() {
+          unmodified = false;
+        }
         function pad(n) {
           n = "" + n;
           if (n.length < 2) {
@@ -141,9 +145,6 @@ block content
           return update_gocardless_a(gocardless_monthly, gocardless_monthly_inc);
         }
         function update_gocardless_initial_inc(e) {
-          if (e) {
-            unmodified = false;
-          }
           return update_gocardless_a(gocardless_initial, gocardless_initial_inc);
         }
         function update_gocardless_a(amount, after) {
