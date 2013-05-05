@@ -79,7 +79,7 @@ module.exports = (app) -> new class
         #expires_at
         #redirect_uri
         #cancel_uri
-        #state
+        state: JSON.stringify {uid: loggedInUser.id, initial: initial, monthly: monthly, start_at: +date, created: +new Date()}
         user:
           first_name: firstName
           last_name: lastName
@@ -92,11 +92,28 @@ module.exports = (app) -> new class
       response.redirect url
     else if req.query.signature
       # We've got a response!
-      console.log JSON.stringify req.query
+      state = null
+      try
+        state = JSON.parse (req.query.state ? "")
+      unless state
+        return response.render 'message', {title:"Error", text: "We couldn't complete the transaction, are you sure you did it all correctly?"}
+      unless state.uid is loggedInUser.id
+        return response.render 'message', {title:"Error", text: "We couldn't complete the transaction, you're not the same person that started it?"}
+      delete state.uid
+
       gocardlessClient.confirmResource req.query, (err, res) ->
         if err
           return response.render 'message', {title:"Error", text: "We couldn't complete the transaction, GoCardless returned an error: '#{err.message}'"}
         else
-          response.render 'message', {title:"Done", text: "Thanks for being super-awesome, you super-awesome person you!"}
+          try
+            data = JSON.parse loggedInUser.data
+          data ?= {}
+          data.gocardless = state
+          loggedInUser.data = JSON.stringify data
+          r = loggedInUser.save()
+          r.success ->
+            response.render 'message', {title:"Done", text: "Thanks for being super-awesome, you super-awesome person you!"}
+          r.error (err) ->
+            response.render 'message', {title:"Done, but...", text: "Your subscription was set up, but we've not been able to store that fact for some technical reason or other. This doesn't really matter..."}
     else
       render()
