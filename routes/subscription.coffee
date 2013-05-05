@@ -25,9 +25,19 @@ module.exports = (app) -> new class
           err.date = "Invalid date"
         else
           date = new Date(yyyy, mm-1, dd)
-        if +date < +new Date()
+        tomorrow = new Date()
+        tomorrow.setHours(0)
+        tomorrow.setMinutes(0)
+        tomorrow.setSeconds(0)
+        tomorrow.setDate(tomorrow.getDate()+1)
+        nextMonth = new Date()
+        nextMonth.setMonth(nextMonth.getMonth()+1)
+        nextMonth.setHours(23)
+        nextMonth.setMinutes(59)
+        nextMonth.setSeconds(59)
+        if +date < +tomorrow
           err.date = "Earliest date allowed is tomorrow"
-        if +date > (+new Date() + (24*60*60*1000 * 28 * 3))
+        if +date > +nextMonth
           err.date = "Date is too far in the future"
       else
         err.date = "Invalid date - must by YYYY-MM-DD"

@@ -57,16 +57,26 @@ block content
     p To get started, just enter your preferred monthly payment amount below:
     form(method='POST', action="/subscription/gocardless")
       - var startDate = loggedInUser.paidUntil && +loggedInUser.paidUntil.getFullYear() > 2012 ? loggedInUser.paidUntil : loggedInUser.approved;
-      - var firstPayment = new Date(startDate.getTime())
+      - var firstPayment = new Date()
+      - firstPayment.setDate(firstPayment.getDate()+1)
+      - var nextAnniversary = new Date(startDate.getTime())
       - var now = +new Date();
-      - while (+firstPayment < now) {firstPayment.setMonth(firstPayment.getMonth()+1);}
-      - var monthsOwed = Math.max(0, Math.round((+firstPayment - startDate)/(24*60*60*1000*30.4))); // Don't look at me like that. This should never be more than a couple of months!
+      - while (+nextAnniversary < now) {nextAnniversary.setMonth(nextAnniversary.getMonth()+1);}
+      - var lastAnniversary = new Date(nextAnniversary.getTime())
+      - lastAnniversary.setMonth(lastAnniversary.getMonth()-1)
+      - var finishDate = lastAnniversary;
+      if (new Date() - finishDate) > (14.5 * 24 * 60 * 60 * 1000)
+        - finishDate = nextAnniversary
+      - function monthDifference(a, b) { var a_m = a.getMonth()+a.getFullYear()*12, b_m = b.getMonth()+b.getFullYear()*12; return a_m - b_m; }
+      - var monthsOwed = Math.max(0, monthDifference(finishDate, startDate));
       input(type='hidden', name='form', value='gocardless')
       table.table.table-bordered(style='width:auto')
         tr
           th First monthly payment
             br
             small Payments will come out on or around this day each month.
+            br
+            small Must be between tomorrow and one month's time.
           td
             input(type='text', name='date', value="#{(data && data.date) || formatDate(firstPayment)}")
             br
@@ -87,7 +97,7 @@ block content
           th Initial fee, £
             br
             if monthsOwed > 0
-              small To cover the #{monthsOwed} month period #{formatDate(startDate)} to #{formatDate(firstPayment)}.
+              small To cover the #{monthsOwed} month period #{formatDate(startDate)} to #{formatDate(finishDate)}.
             else
               small One-off donation, completely optional.
             br
