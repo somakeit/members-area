@@ -5,13 +5,16 @@ block content
     h2 Subscription
 
   block subscriptionstatus
+    - var duration = Math.floor((new Date() - loggedInUser.paidUntil)/(24*60*60*1000));
+    - durationText = duration + (duration == 1 ? " day" : " days")
     if !loggedInUser.paidUntil || loggedInUser.paidUntil.getFullYear() < 2013
       p.text-error We have received no subscription payments from you yet (payments may take
         |  a couple of days to show up). Please set up a standing order to the details at the bottom of the page.
-    else if +loggedInUser.paidUntil < +new Date()
-      - var duration = Math.floor((new Date() - loggedInUser.paidUntil)/(24*60*60*1000));
-      - duration = duration + (duration == 1 ? " day" : " days")
-      p.text-warning Your subscription is #{duration} overdue. Please set up or check your standing order to the details at the bottom of the page.
+    else if duration > 14
+      p.text-error Your subscription is #{durationText} overdue. Please set up or check your standing order to the details at the bottom of the page.
+    else if duration > 0
+      p.text-warning Your subscription is #{durationText} overdue.
+      // XXX: Check for GoCardless/etc.
     else
       p.text-success Your subscription is up to date - thanks very much!
       p Your next payment is due: 
