@@ -64,12 +64,26 @@ module.exports = (app) -> new class
       tmp = loggedInUser.fullname.split(" ")
       firstName = tmp[0]
       lastName = tmp[tmp.length-1]
-      tmp = loggedInUser.address.match /[A-Z]{2}[0-9]{1,2}\s*[0-9][A-Z]{2}/
+      address = loggedInUser.address
+      tmp = address.match /[A-Z]{2}[0-9]{1,2}\s*[0-9][A-Z]{2}/i
       if tmp
-        postcode = tmp[0]
-      address1 = loggedInUser.address
-      if postcode
-        address1 = address1.replace(postcode, "")
+        postcode = tmp[0].toUpperCase()
+        address = address.replace(tmp[0], "")
+      tmp = address.split /[\n\r,]/
+      tmp = tmp.filter (a) -> a.replace(/\s+/g, "").length > 0
+      tmp = tmp.filter (a) -> !a.match /^(hants|hampshire)$/
+      for potentialTown, i in tmp
+        t = potentialTown.replace /[^a-z]/gi, ""
+        if t.match /^(southampton|soton|eastleigh|chandlersford|winchester|northbaddesley|havant|portsmouth|bournemouth|poole|bognorregis|romsey|lyndhurst|eye|warsash|lymington)$/i
+          town = potentialTown
+          tmp.splice i, 1
+          break
+      town ?= "Southamton"
+
+      if tmp.length > 1
+        address2 = tmp.pop()
+      address1 = tmp.join(", ")
+
       pad = response.locals.pad
       parameters =
         name: "M#{response.locals.pad(loggedInUser.id, 6)}"
@@ -86,6 +100,8 @@ module.exports = (app) -> new class
           email: loggedInUser.email
           account_name: loggedInUser.fullname
           billing_address1: address1
+          billing_address2: address2
+          billing_town: town
           billing_postcode: postcode
         setup_fee: initial
       url = gocardlessClient.newSubscriptionUrl monthly, 1, 'month', parameters
