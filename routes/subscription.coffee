@@ -34,6 +34,8 @@ module.exports = (app) -> new class
         tomorrow.setSeconds(0)
         tomorrow.setDate(tomorrow.getDate()+1)
         nextMonth = new Date()
+        if loggedInUser.paidUntil && +loggedInUser.paidUntil > +nextMonth
+          nextMonth = new Date(+loggedInUser.paidUntil)
         nextMonth.setMonth(nextMonth.getMonth()+1)
         nextMonth.setHours(23)
         nextMonth.setMinutes(59)

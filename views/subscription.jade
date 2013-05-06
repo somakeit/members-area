@@ -5,7 +5,10 @@ block content
     h2 Subscription
 
   block subscriptionstatus
-    - var duration = Math.floor((new Date() - loggedInUser.paidUntil)/(24*60*60*1000));
+    - var paidUntil = loggedInUser.paidUntil
+    if loggedInUser.approved > paidUntil
+      - paidUntil = loggedInUser.approved
+    - var duration = Math.floor((new Date() - paidUntil)/(24*60*60*1000));
     - durationText = duration + (duration == 1 ? " day" : " days")
     if !loggedInUser.paidUntil || loggedInUser.paidUntil.getFullYear() < 2013
       p.text-error We have received no subscription payments from you yet (payments may take
@@ -64,6 +67,8 @@ block content
       - var startDate = loggedInUser.paidUntil && +loggedInUser.paidUntil.getFullYear() > 2012 ? loggedInUser.paidUntil : loggedInUser.approved;
       - var firstPayment = new Date()
       - firstPayment.setDate(firstPayment.getDate()+1)
+      if loggedInUser.paidUntil && +loggedInUser.paidUntil > +firstPayment
+        - firstPayment = new Date(+loggedInUser.paidUntil)
       - var nextAnniversary = new Date(startDate.getTime())
       - var now = +new Date();
       - while (+nextAnniversary < now) {nextAnniversary.setMonth(nextAnniversary.getMonth()+1);}
