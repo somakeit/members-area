@@ -72,19 +72,14 @@ block content
       p.text-success It seems you already have GoCardless payments in place?
     p To get started, just enter your preferred monthly payment amount below:
     form(method='POST', action="/subscription/gocardless")
+      - var now = +new Date();
       - var startDate = loggedInUser.paidUntil && +loggedInUser.paidUntil.getFullYear() > 2012 ? loggedInUser.paidUntil : loggedInUser.approved;
-      - var firstPayment = new Date()
-      - firstPayment.setDate(firstPayment.getDate()+1)
+      - var nextAnniversary = new Date(startDate.getTime())
+      - while (+nextAnniversary < now) {nextAnniversary.setMonth(nextAnniversary.getMonth()+1);}
+      - var firstPayment = new Date(nextAnniversary.getTime())
       if loggedInUser.paidUntil && +loggedInUser.paidUntil > +firstPayment
         - firstPayment = new Date(+loggedInUser.paidUntil)
-      - var nextAnniversary = new Date(startDate.getTime())
-      - var now = +new Date();
-      - while (+nextAnniversary < now) {nextAnniversary.setMonth(nextAnniversary.getMonth()+1);}
-      - var lastAnniversary = new Date(nextAnniversary.getTime())
-      - lastAnniversary.setMonth(lastAnniversary.getMonth()-1)
-      - var finishDate = lastAnniversary;
-      if (new Date() - finishDate) > (14.5 * 24 * 60 * 60 * 1000)
-        - finishDate = nextAnniversary
+      - var finishDate = nextAnniversary;
       - function monthDifference(a, b) { var a_m = a.getMonth()+a.getFullYear()*12, b_m = b.getMonth()+b.getFullYear()*12; return a_m - b_m; }
       - var monthsOwed = Math.max(0, monthDifference(finishDate, startDate));
       input(type='hidden', name='form', value='gocardless')
