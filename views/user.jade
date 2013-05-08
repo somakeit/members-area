@@ -18,9 +18,9 @@ block content
       hr
       h3 ADMIN STUFF
       if !user.paidUntil || user.paidUntil.getFullYear() < 2013
-        - var paidUntil = loggedInUser.paidUntil
-        if loggedInUser.approved > paidUntil
-          - paidUntil = loggedInUser.approved
+        - var paidUntil = user.paidUntil
+        if user.approved > paidUntil
+          - paidUntil = user.approved
         - var duration = Math.floor((new Date() - paidUntil)/(24*60*60*1000));
         - durationText = duration + (duration == 1 ? " day" : " days")
         p.text-error Member has made no payments (#{durationText} overdue)
