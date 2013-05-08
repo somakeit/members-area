@@ -68,6 +68,8 @@ block content
     h3 GoCardless
     p GoCardless are the next cheapest way to send us money after standing orders/cash. They charge just 1% per transaction (e.g. 20p for every £20) and so are very affordable.
     p.text-info GoCardless collect money via Direct Debit, and so your payments are covered by the Direct Debit Guarantee.
+    if loggedInUser.getData().gocardless
+      p.text-success It seems you already have GoCardless payments in place?
     p To get started, just enter your preferred monthly payment amount below:
     form(method='POST', action="/subscription/gocardless")
       - var startDate = loggedInUser.paidUntil && +loggedInUser.paidUntil.getFullYear() > 2012 ? loggedInUser.paidUntil : loggedInUser.approved;
