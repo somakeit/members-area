@@ -75,7 +75,10 @@ html
                   -templates = ['subscription']
                   -className = (templates.indexOf(templateName) != -1 ?  'active' : '')
                   if !loggedInUser.paidUntil || loggedInUser.paidUntil.getTime() <= new Date().getTime()
-                    -className += " warning"
+                    if loggedInUser.getData().gocardless && (new Date() - loggedInUser.getData().gocardless.start_at) < (4*24*60*60*1000)
+                      -className += " pending"
+                    else
+                      -className += " warning"
                   li(class=className)
                     a(href="/subscription") Subscription
 

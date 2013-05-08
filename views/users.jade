@@ -13,6 +13,8 @@ block content
             -className += " neverpaid"
           else if +user.paidUntil < +new Date()
             -className += " overdue"
+          if user.data.gocardless && (new Date() - user.data.gocardless.start_at) < (4*24*60*60*1000)
+            -className += " pending"
         if user.data && user.data.rejected
           -className += " rejected"
         if user.data && user.data.validationCode && user.data.email == user.email
@@ -22,9 +24,15 @@ block content
           a(href="/user/#{user.id}") #{user.fullname} (#{user.username})
             if admin
               if !user.paidUntil || user.paidUntil.getFullYear() < 2013
-                small  (never paid)
+                if user.data.gocardless && (new Date() - user.data.gocardless.start_at) < (4*24*60*60*1000)
+                  small  (never paid, gocardless pending)
+                else
+                  small  (never paid)
               else if +user.paidUntil < +new Date()
-                small  (overdue for #{Math.floor((+new Date() - user.paidUntil)/(24*60*60*1000))} days)
+                if user.data.gocardless && (new Date() - user.data.gocardless.start_at) < (4*24*60*60*1000)
+                  small  (overdue for #{Math.floor((+new Date() - user.paidUntil)/(24*60*60*1000))} days, gocardless pending)
+                else
+                  small  (overdue for #{Math.floor((+new Date() - user.paidUntil)/(24*60*60*1000))} days)
         else if admin
           a(href="/user/#{user.id}") #{user.fullname} (#{user.username})
             if user.data && user.data.rejected

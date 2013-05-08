@@ -11,4 +11,14 @@ module.exports = (sequelize, DataTypes) ->
     wikiname: {type: DataTypes.STRING, allowNull:true}
     approved: {type: DataTypes.DATE, allowNull: true}
     data: {type:DataTypes.TEXT, allowNull: false}
-  }, {timestamps: true}
+  }, {
+    timestamps: true
+    instanceMethods:
+      getData: ->
+        data = null
+        try
+          data = JSON.parse @data
+        return data ? {}
+      setData: (data) ->
+        @data = JSON.stringify data
+  }

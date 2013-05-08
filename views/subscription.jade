@@ -1,47 +1,174 @@
 extends layout
 
 block content
-  h2 Subscription
-  if !loggedInUser.paidUntil || loggedInUser.paidUntil.getFullYear() < 2013
-    p.text-error We have received no subscription payments from you yet (payments may take
-      |  a couple of days to show up). Please set up a standing order to the details at the bottom of the page.
-  else if +loggedInUser.paidUntil < +new Date()
-    p.text-warning Your subscription is overdue. Please set up or check your standing order to the details at the bottom of the page.
-  else
-    p.text-success Your subscription is up to date - thanks very much!
-    p Your next payment is due: 
-      strong= formatDate(loggedInUser.paidUntil)
-  h3 Payments
-  if err
-    p.text-error Error loading payments from DB.
-  else
-    if payments.length == 0
-      p.text-error No payments made
+  block h2
+    h2 Subscription
+
+  block subscriptionstatus
+    - var paidUntil = loggedInUser.paidUntil
+    if loggedInUser.approved > paidUntil
+      - paidUntil = loggedInUser.approved
+    - var duration = Math.floor((new Date() - paidUntil)/(24*60*60*1000));
+    - durationText = duration + (duration == 1 ? " day" : " days")
+    if !loggedInUser.paidUntil || loggedInUser.paidUntil.getFullYear() < 2013
+      p.text-error We have received no subscription payments from you yet (payments may take
+        |  a couple of days to show up). Please set up a standing order to the details at the bottom of the page.
+    else if duration > 14
+      if loggedInUser.getData().gocardless && (new Date() - loggedInUser.getData().gocardless.start_at) < (4*24*60*60*1000)
+        p.text-info Your subscription is #{durationText} overdue, but it seems you've set up a GoCardless direct debit, so don't worry...
+      else
+        p.text-error Your subscription is #{durationText} overdue. Please set up or check your standing order to the details at the bottom of the page.
+    else if duration > 0
+      if loggedInUser.getData().gocardless
+        p.text-info Your subscription is #{durationText} overdue, but it seems you've set up a GoCardless direct debit, so don't worry...
+      else
+        p.text-warning Your subscription is #{durationText} overdue.
+      // XXX: Check for GoCardless/etc.
     else
-      table.table.table-striped
-        tr
-          each entry, key in paymentColumns
-            th= entry.t
-        for payment in payments
+      p.text-success Your subscription is up to date - thanks very much!
+      p Your next payment is due: 
+        strong= formatDate(loggedInUser.paidUntil)
+    h3 Payments received
+    if err
+      p.text-error Error loading payments from DB.
+    else
+      if payments.length == 0
+        p.text-error No payments made
+      else
+        table.table.table-striped
           tr
             each entry, key in paymentColumns
-              td= entry.f(payment[key], payment)
-  p.muted Remember: subscription is pay what you think the space is worth
-    |  (minimum £5/mo), but we require an average of £20/member/mo to keep
-    |  the space running - please be generous!
-  h3 Standing order instructions
-  p Please make standing orders out to the following:
-  table.table.table-bordered(style='width: auto')
-    tr
-      th Payee name
-      td So Make It Ltd.
-    tr
-      th Sort code
-      td #{process.env.SORTCODE}
-    tr
-      th Account number
-      td #{process.env.ACCOUNTNUMBER}
-    tr
-      th Payment reference
-      td M#{pad(loggedInUser.id, 6)}
-  p.muted Note: the payment reference is specific to your account.
+              th= entry.t
+          for payment in payments
+            tr
+              each entry, key in paymentColumns
+                td= entry.f(payment[key], payment)
+    p.muted Remember: subscription is pay what you think the space is worth
+      |  (minimum £5/mo), but we require an average of £20/member/mo to keep
+      |  the space running - please be generous!
+  block standingorder
+    h3 Standing order instructions
+    p Please make standing orders out to the following:
+    table.table.table-bordered(style='width: auto')
+      tr
+        th Payee name
+        td So Make It Ltd.
+      tr
+        th Sort code
+        td #{process.env.SORTCODE}
+      tr
+        th Account number
+        td #{process.env.ACCOUNTNUMBER}
+      tr
+        th Payment reference
+        td M#{pad(loggedInUser.id, 6)}
+    p.muted Note: the payment reference is specific to your account.
+
+  block gocardless
+    h3 GoCardless
+    p GoCardless are the next cheapest way to send us money after standing orders/cash. They charge just 1% per transaction (e.g. 20p for every £20) and so are very affordable.
+    p.text-info GoCardless collect money via Direct Debit, and so your payments are covered by the Direct Debit Guarantee.
+    if loggedInUser.getData().gocardless
+      p.text-success It seems you already have GoCardless payments in place?
+    p To get started, just enter your preferred monthly payment amount below:
+    form(method='POST', action="/subscription/gocardless")
+      - var now = +new Date();
+      - var startDate = loggedInUser.paidUntil && +loggedInUser.paidUntil.getFullYear() > 2012 ? loggedInUser.paidUntil : loggedInUser.approved;
+      - var nextAnniversary = new Date(startDate.getTime())
+      - while (+nextAnniversary < now) {nextAnniversary.setMonth(nextAnniversary.getMonth()+1);}
+      - var firstPayment = new Date(nextAnniversary.getTime())
+      if loggedInUser.paidUntil && +loggedInUser.paidUntil > +firstPayment
+        - firstPayment = new Date(+loggedInUser.paidUntil)
+      - var finishDate = nextAnniversary;
+      - function monthDifference(a, b) { var a_m = a.getMonth()+a.getFullYear()*12, b_m = b.getMonth()+b.getFullYear()*12; return a_m - b_m; }
+      - var monthsOwed = Math.max(0, monthDifference(finishDate, startDate));
+      input(type='hidden', name='form', value='gocardless')
+      table.table.table-bordered(style='width:auto')
+        tr
+          th First monthly payment
+            br
+            small Payments will come out on or around this day each month.
+            br
+            small Must be between tomorrow and one month's time.
+          td
+            input(type='text', name='date', value="#{(data && data.date) || formatDate(firstPayment)}")
+            br
+            small (YYYY-MM-DD)
+            if gocardlessErr && gocardlessErr.date
+              br
+              p.text-error= gocardlessErr.date
+        tr
+          th Monthly amount, £
+          td
+            input(type='text', name='monthly', value="#{(data && data.monthly) || 30.00}", id="gocardless_monthly")
+            br
+            small (Including the GoCardless fee, this will be £<strong id='gocardless_monthly_inc'></strong>)
+            if gocardlessErr && gocardlessErr.monthly
+              br
+              p.text-error= gocardlessErr.monthly
+        tr
+          th Initial fee, £
+            br
+            if monthsOwed > 0
+              small To cover the #{monthsOwed} month period #{formatDate(startDate)} to #{formatDate(finishDate)}.
+            else
+              small One-off donation, completely optional.
+            br
+            small This will be taken out of your account soon.
+          td
+            input(type='text', name='initial', value="#{(data && data.initial) || "0.00"}", id="gocardless_initial")
+            br
+            small (Including the GoCardless fee, this will be £<strong id='gocardless_initial_inc'></strong>)
+            if gocardlessErr && gocardlessErr.initial
+              br
+              p.text-error= gocardlessErr.initial
+      button.btn.btn-success.btn-large(type='submit') Set up payments
+    script(type='text/javascript')
+      (function() {
+        var gocardless_monthly = document.getElementById('gocardless_monthly');
+        var gocardless_initial = document.getElementById('gocardless_initial');
+        var gocardless_monthly_inc = document.getElementById('gocardless_monthly_inc');
+        var gocardless_initial_inc = document.getElementById('gocardless_initial_inc');
+        var unmodified = #{!!data ? "false" : "true"};
+        gocardless_monthly.addEventListener('change', update_gocardless_monthly_inc, false);
+        gocardless_monthly.addEventListener('keyup', update_gocardless_monthly_inc, false);
+        gocardless_initial.addEventListener('change', make_modified, false);
+        gocardless_initial.addEventListener('change', update_gocardless_initial_inc, false);
+        gocardless_initial.addEventListener('keyup', update_gocardless_initial_inc, false);
+        function make_modified() {
+          unmodified = false;
+        }
+        function pad(n) {
+          n = "" + n;
+          if (n.length < 2) {
+            n = "0" + n;
+          }
+          return n;
+        }
+        function update_gocardless_monthly_inc() {
+          if (unmodified) {
+            var v = parseFloat(gocardless_monthly.value);
+            if (!isNaN(v)) {
+              v = Math.round(#{monthsOwed} * v * 100);
+              v = "" + Math.floor(v/100) + "." + pad(v % 100);
+              gocardless_initial.value = v;
+              update_gocardless_initial_inc();
+            }
+          }
+          return update_gocardless_a(gocardless_monthly, gocardless_monthly_inc);
+        }
+        function update_gocardless_initial_inc(e) {
+          return update_gocardless_a(gocardless_initial, gocardless_initial_inc);
+        }
+        function update_gocardless_a(amount, after) {
+          var amount = parseFloat(amount.value);
+          if (!isNaN(amount)) {
+            amount *= 100;
+            amount = Math.ceil(100/99 * amount);
+            amount = "" + Math.floor(amount/100) + "." + pad(amount % 100);
+            after.textContent = amount;
+          }
+        }
+        update_gocardless_monthly_inc();
+        update_gocardless_initial_inc();
+      })();

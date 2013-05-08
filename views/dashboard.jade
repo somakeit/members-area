@@ -10,9 +10,12 @@ block content
     p.text-info You're an admin! Most admin functionality operates via profiles - have a look at the members list.
   h4 Subscription status
   if !loggedInUser.paidUntil || loggedInUser.paidUntil.getTime() <= new Date().getTime()
-    p.text-error Your subscription payment is overdue - please 
-      a(href="/subscription") set up payments now
-      | .
+    if loggedInUser.getData().gocardless && (new Date() - loggedInUser.getData().gocardless.start_at) < (4*24*60*60*1000)
+      p.text-info Your subscription payment is overdue - but apparently you've set up a GoCardless direct debit, so don't worry :)
+    else
+      p.text-error Your subscription payment is overdue - please 
+        a(href="/subscription") set up payments now
+        | .
   else
     p.text-success You're paid up until 
       strong= loggedInUser.paidUntil.toString()
