@@ -31,6 +31,14 @@ EMAIL_PASSWORD=yourpassword
 APPROVAL_TEAM_EMAIL=yours+approval@gmail.com
 TRUSTEES_ADDRESS=yours+trustees@gmail.com
 SERVER_ADDRESS=http://localhost:1337
+REQUIRED_VOTES=1
+SORTCODE=00-00-00
+ACCOUNTNUMBER=0000 0000
+GOCARDLESS_ENVIRONMENT=sandbox
+GOCARDLESS_APP_ID=
+GOCARDLESS_APP_SECRET=
+GOCARDLESS_MERCHANT=
+GOCARDLESS_TOKEN=
 ```
 
 (Set `NODE_ENV` to `development` to get logging on the console/etc;
