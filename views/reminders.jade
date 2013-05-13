@@ -26,4 +26,4 @@ block content
         |  
         a(href="mailto:"+user.email+"?subject="+encodeURIComponent("So Make It: Payment "+durationText+" overdue")+"&bcc="+encodeURIComponent(bcc)) #{user.email}
         |  
-        a(href="mailto:"+user.email+"?subject="+encodeURIComponent("So Make It: Payment "+durationText+" overdue")+"&body="+encodeURIComponent(emailText)+"&bcc="+encodeURIComponent(bcc)) (including body)
+        textarea(rows=1, cols=8)= emailText
