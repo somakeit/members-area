@@ -46,6 +46,29 @@ module.exports = (app) -> new class
       """
     r = req.User.findAll(query)
     r.success (users) ->
-      response.render 'reminders', {title: "Reminders", users: users, bcc: process.env.TRUSTEES_ADDRESS}
+      body = """
+      Dear {{NAME}},
+
+      This email is a reminder that your membership for So Make It is {{DURATION}} overdue. To resolve this, please visit the secure members site by clicking the link below:
+
+      https://members.somakeit.org.uk/subscription
+
+      There are a number of options for payment of your subscription, in order of our preference they are:
+      Set up a standing order with your bank (see link above for details; there is no charge for this)
+      Quickly and easily set up a Direct Debit online via GoCardless.com (see link above for details; GoCardless charges a tiny 1% per transaction fee)
+      Pay in cash at the space (talk to a trustee)
+      Set up a payment via PayPal (talk to a trustee first; PayPal charges a £0.20 + 3.4% per transaction fee)
+      Remember: the membership fee is still based on a "pay what you feel the space is worth" system so we ask you to pay what you can afford and what you feel access to the space is worth to you. There's bills to pay, equipment to buy and we'll need a significant amount of cash reserved for when our arrangement with rideride expires at the end of September, so please be generous.
+
+      We estimate that we need an average of at least £20/member/mo to survive the year, but we're aware that some members cannot afford that, so minimum membership is set at £5/mo. Current statistics put our 13 paying members at an average of £19.59/mo; though when you factor in the 17 members who've not yet got around to paying that drops significantly to £8.49/mo.
+
+      If you no longer wish to be a member you must tell us in writing, since you are already on our register of members. You'll still be able to join us at our monthly meetup (last Tuesday of every month) and talk about your projects, share ideas and even do some light hacking and tinkering. You are also welcome to come along to regular opening times as a guest and see what we do. As treasurer I’m very happy to discuss money matters or any issues. Alternatively, if you prefer, you can contact the other trustees directly who will be happy to help.
+
+      Thank you for your support.
+
+      Chris Smith
+      So Make It Treasurer
+      """
+      response.render 'reminders', {title: "Reminders", users: users, bcc: process.env.TRUSTEES_ADDRESS, body: body}
     r.error (err) ->
       response.render 'message', {title:"Error", text: "Unknown error occurred, please try again later."}
