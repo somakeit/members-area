@@ -1,0 +1,26 @@
+extends layout
+
+block content
+  h2 User list
+  ul.user-list
+    each user in users
+      -className = ""
+      li(class=className)
+        a(href="/user/#{user.id}") #{user.fullname} (#{user.username})
+          - var paidUntil = user.paidUntil
+          if !paidUntil || user.approved > paidUntil
+            - paidUntil = user.approved
+          - var duration = Math.floor((new Date() - paidUntil)/(24*60*60*1000));
+          - durationText = duration + (duration == 1 ? " day" : " days")
+          if !user.paidUntil || user.paidUntil.getFullYear() < 2013
+            if user.getData().gocardless && (new Date() - user.getData().gocardless.start_at) < (4*24*60*60*1000)
+              small  (never paid, gocardless pending)
+            else
+              small  (never paid)
+          else if +user.paidUntil < +new Date()
+            if user.getData().gocardless && (new Date() - user.getData().gocardless.start_at) < (4*24*60*60*1000)
+              small  (overdue for #{Math.floor((+new Date() - user.paidUntil)/(24*60*60*1000))} days, gocardless pending)
+            else
+              small  (overdue for #{Math.floor((+new Date() - user.paidUntil)/(24*60*60*1000))} days)
+        |  
+        a(href="mailto:"+user.email+"?subject="+encodeURIComponent("So Make It: Payment "+durationText+" overdue")+"&bcc="+encodeURIComponent(bcc)) #{user.email}

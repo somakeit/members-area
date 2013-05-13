@@ -28,3 +28,24 @@ module.exports = (app) -> new class
       else
         req.error err
       response.render 'subscription', {title: 'Subscription', payments: payments, err: err, gocardlessErr: null, data: null}
+
+  reminders: (req, response, next) ->
+    if !response.locals.loggedInUser.admin
+      return next()
+    # Only show people 15 days overdue or more
+    ymd = new Date()
+    ymd.setDate(ymd.getDate() - 15)
+    ymd = response.locals.formatDate ymd
+    query = where: """
+        approved IS NOT NULL AND
+        approved > '2013-01-01' AND
+        (
+          paidUntil IS NULL OR
+          paidUntil < '#{ymd}'
+        )
+      """
+    r = req.User.findAll(query)
+    r.success (users) ->
+      response.render 'reminders', {title: "Reminders", users: users, bcc: process.env.TRUSTEES_ADDRESS}
+    r.error (err) ->
+      response.render 'message', {title:"Error", text: "Unknown error occurred, please try again later."}

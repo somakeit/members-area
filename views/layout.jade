@@ -96,6 +96,10 @@ html
                       li(class=(templates.indexOf(templateName) != -1 ?  'active' : ''))
                         a(href="/admin/money") Banking/Money
 
+                      -templates = ['reminders']
+                      li(class=(templates.indexOf(templateName) != -1 ?  'active' : ''))
+                        a(href="/admin/reminders") Reminders
+
               .span9.main
                 block content
           else
