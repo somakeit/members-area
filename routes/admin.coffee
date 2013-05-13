@@ -39,6 +39,7 @@ module.exports = (app) -> new class
     query = where: """
         approved IS NOT NULL AND
         approved > '2013-01-01' AND
+        approved < '#{ymd}' AND
         (
           paidUntil IS NULL OR
           paidUntil < '#{ymd}'
