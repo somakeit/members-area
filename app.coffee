@@ -27,6 +27,7 @@ app = express()
 user = require('./routes/user')(app)
 dashboard = require('./routes/dashboard')(app)
 subscription = require('./routes/subscription')(app)
+admin = require('./routes/admin')(app)
 
 stylusCompile = (str, path) ->
   return stylus(str)
@@ -143,6 +144,7 @@ app.all '/user/:userId', user.view
 app.all '/subscription', subscription.index
 app.all '/subscription/gocardless', subscription.gocardless
 app.all '/viewRegister', user.viewRegister
+app.all '/admin/money', admin.money
 
 handle501 = (req, res) ->
   res.statusCode = 501

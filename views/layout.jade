@@ -92,6 +92,10 @@ html
                       li(class=(templates.indexOf(templateName) != -1 ?  'active' : ''))
                         a(href="/viewRegister") Register of members
 
+                      -templates = ['money']
+                      li(class=(templates.indexOf(templateName) != -1 ?  'active' : ''))
+                        a(href="/admin/money") Banking/Money
+
               .span9.main
                 block content
           else
