@@ -7,11 +7,12 @@ block body
     .span4.offset1.gumph
       h2 Membership
       p So Make It Ltd. is a members-ran non-profit company. Membership is paid
-        | monthly by standing order. We ask that you pay what
-        | you think the space is worth to you. Running an organisation like this
-        | isn't cheap, so please be as generous as you can. The minimum
-        | subscription is £5/month. The space requires our members to contribute an
-        | average subscription of £20/month to survive.
+        | monthly by standing order. 
+        strong The minimum subscription is £5/month, and is due as soon as you're approved. 
+        | We ask that you pay what you think the space is worth to you, but
+        | running an organisation like this isn't cheap, so please be as
+        | generous as you can.  The space requires our members to contribute an
+        | average subscription of at least £20/month to survive.
 
       p By joining you're becoming a member of So Make It Ltd. (as goverened by 
         a(href="http://www.legislation.gov.uk/ukpga/2006/46/part/8/chapter/2/crossheading/general") UK law
@@ -29,6 +30,12 @@ block body
 
       p Many of the services provided by So Make It require a username and
         | password, so you will need to choose a unique username.
+
+      p If you do not wish to give your address, please 
+        a(href="mailto:join@somakeit.org.uk?subject=Associate%20Membership") email us
+        |  and we'll let you know when we add 
+        a(href="https://wiki.somakeit.org.uk/wiki/Associate_Membership") Associate Membership
+        | .
 
     .span4.offset1.register-form
       h2 Registration form
@@ -89,7 +96,16 @@ block body
               a(href="http://so-make-it.github.com/constitution/constitution.pdf") constitution
               |  and 
               a(href="http://wiki.somakeit.org.uk/wiki/Rules") rules
-              |.
+              | . 
+
+          - controlGroupClass = (err && err.subs ? "error" : "")
+          .control-group(class=controlGroupClass)
+            label(class="text-"+controlGroupClass)
+              input(type="checkbox", name="subs", tabindex=tabIndex++)
+              |  Further I 
+              strong agree to pay a monthly subscription 
+              | to So Make It by standing order, bank transfer, cash, or any
+              | other method that the Trustees approve from time to time.
 
           if err && err.antispam
             p.text-error You tripped our robot alarm (we're not convinced you're human). Please contact 

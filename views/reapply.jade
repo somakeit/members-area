@@ -57,6 +57,15 @@ block body
               a(href="http://wiki.somakeit.org.uk/wiki/Rules") rules
               |.
 
+          - controlGroupClass = (err && err.subs ? "error" : "")
+          .control-group(class=controlGroupClass)
+            label(class="text-"+controlGroupClass)
+              input(type="checkbox", name="subs", tabindex=tabIndex++)
+              |  Further I 
+              strong agree to pay a monthly subscription 
+              | to So Make It by standing order, bank transfer, cash, or any
+              | other method that the Trustees approve from time to time.
+
           if err && err.unknown
             p.text-error An unknown error occurred. Please contact 
               a(href="mailto:benjie@somakeit.org.uk?subject=Signup%20Issue") Benjie

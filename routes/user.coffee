@@ -315,7 +315,9 @@ module.exports = (app) -> self = new class
               error.address = true
             unless req.body.terms is 'on'
               error.terms = true
-            if !error.fullname and !error.address and !error.terms
+            unless req.body.subs is 'on'
+              error.subs = true
+            if !error.fullname and !error.address and !error.terms and !error.subs
               # Save reapplication
               user.fullname = req.body.fullname
               user.address = req.body.address
@@ -642,12 +644,14 @@ module.exports = (app) -> self = new class
         error.address = true
       unless req.body.terms is 'on'
         error.terms = true
+      unless req.body.subs is 'on'
+        error.subs = true
       unless req.body.password?.length >= 6
         error.password = true
       unless req.body.password is req.body.password2
         error.password = true
         error.passwordsdontmatch = true
-      if error.email or error.fullname or error.address or error.terms or error.password or error.username or error.antispam
+      if error.email or error.fullname or error.address or error.terms or error.subs or error.password or error.username or error.antispam
         render(err:error, data: req.body)
       else
         # Attempt registration
