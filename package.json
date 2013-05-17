@@ -3,7 +3,8 @@
   "version": "0.2.0",
   "private": true,
   "scripts": {
-    "start": "node_modules/.bin/coffee -c -m .; node app.js"
+    "start": "node_modules/.bin/coffee -c -m .; node app.js",
+    "test": "mocha --compilers coffee:coffee-script --reporter nyan"
   },
   "dependencies": {
     "express": "~3.1.0",
@@ -16,11 +17,17 @@
     "nib": "~0.9.1",
     "source-map-support": "~0.1.2",
     "winston": "~0.6.2",
-    "gocardless": "~0.1.0"
+    "gocardless": "~0.1.0",
+    "date-utils": "~1.2.12",
+    "ofx": "~0.1.0",
+    "underscore": "~1.4.4",
+    "async": "~0.2.8"
   },
   "devDependencies": {
     "sqlite3": "~2.1.5",
-    "nodemon": "~0.7.5"
+    "nodemon": "~0.7.5",
+    "mocha": "~1.9.0",
+    "chai": "~1.6.0"
   },
   "engines": {
     "node": "0.8.x",
