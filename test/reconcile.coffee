@@ -1,6 +1,9 @@
 chai = require 'chai'
 expect = chai.expect
 
+# Why would you not want this?!
+chai.Assertion.includeStack = true
+
 CustomEventEmitter = require 'sequelize/lib/emitters/custom-event-emitter'
 
 importer = require('../lib/reconcile')
@@ -48,8 +51,8 @@ describe 'OFX import', ->
           return true
       done()
 
-    it 'should contain 3 valid records', ->
-      expect(transactions.length).to.equal 3
+    it 'should contain 4 valid records', ->
+      expect(transactions.length).to.equal 4
       matched = 0
       for transaction in transactions
         if transaction.userId is 1
@@ -64,7 +67,16 @@ describe 'OFX import', ->
           expect(transaction.type).to.equal 'STO'
           expect(transaction.amount).to.equal 10000
           expect(transaction.ymd).to.equal "2007-07-09"
-      expect(matched).to.equal 2
+        if transaction.userId is 11
+          matched++
+          expect(transaction.accountHolder).to.equal 'Kenny'
+          expect(transaction.type).to.equal 'BGC'
+          expect(transaction.amount).to.equal 1001
+          expect(transaction.ymd).to.equal "2007-07-12"
+      expect(matched).to.equal 3
+
+    it 'should be in ascending date order', ->
+      expect(transactions[0].date).to.be.lessThan transactions[1].date
 
 describe 'reconciliation', ->
   transactions = null
@@ -84,7 +96,11 @@ describe 'reconciliation', ->
       for own k, v of details
         @[k] = v
 
-    save: -> # NOOP
+    save: ->
+      promise = new CustomEventEmitter (emitter) ->
+        process.nextTick ->
+          emitter.emit 'success'
+      return promise.run()
 
   class MockPayment extends MockModel
 
@@ -104,34 +120,66 @@ describe 'reconciliation', ->
     addPayment: (p) ->
       @payments.push p
 
+  monthsAgo = new Date()
+  monthsAgo.setMonth(monthsAgo.getMonth()-8)
+
+  yesterday = new Date()
+  yesterday.setDate(yesterday.getDate()-1)
+
+  aMonthFromYesterday = new Date(yesterday.getTime())
+  aMonthFromYesterday.setMonth(aMonthFromYesterday.getMonth()+1)
+
   mockUsers = {
-    "1": new MockUser {id: 1, fullname: "Alice Appleby", paidUntil: null}, [
+    "1": new MockUser {id: 1, fullname: "Alice Appleby", paidUntil: aMonthFromYesterday, approved: yesterday}, [
       new MockPayment {made: new Date("2007-03-29"), amount: 500, type: "STO"}
       new MockPayment {made: new Date("2007-03-29"), amount: 437, type: "BGC"}
       new MockPayment {made: new Date("2007-03-29"), amount: 1500, type: "OTHER"}
     ]
-    "10": new MockUser {id: 10, fullname: "John Hancock", paidUntil: null}, [
+    "10": new MockUser {id: 10, fullname: "John Hancock", paidUntil: yesterday, approved: monthsAgo}, [
       new MockPayment {made: new Date("2007-03-29"), amount: 437, type: "STO"}
       new MockPayment {made: new Date("2007-03-29"), amount: 437, type: "BGC"}
     ]
+    "11": new MockUser {id: 11, fullname: "Kenny", paidUntil: null, approved: yesterday}, []
   }
 
   worksTest = (done) ->
     importer.reconcile {User:MockUser, Payment:MockPayment}, transactions, (err, res) ->
       expect(err).to.not.exist
-      expect(mockUsers[1].payments.length).to.equal 3
-      expect(mockUsers[10].payments.length).to.equal 3
-      newPayment = mockUsers[10].payments[2]
-      expect(newPayment.made.toFormat("YYYY-MM-DD")).to.equal "2007-07-09"
-      expect(newPayment.amount).to.equal 10000
-      expect(newPayment.type).to.equal 'STO'
-      expect(res).to.be.a 'object'
-      expect(res.warnings).to.exist
-      expect(res.warnings.length).to.equal 1
-      # Unknown user 12
-      expect(res.warnings[0]).to.match /unknown.* 12/i
 
-      done()
+      describe 'results', ->
+        it 'should not update user 1', ->
+          expect(mockUsers[1].payments.length).to.equal 3
+          expect(mockUsers[1].paidUntil).to.exist
+          expect(mockUsers[1].paidUntil.toFormat('YYYY-MM-DD')).to.equal aMonthFromYesterday.toFormat('YYYY-MM-DD')
+
+        it 'should update user 10', ->
+          expect(mockUsers[10].payments.length).to.equal 3
+          expect(mockUsers[10].paidUntil.toFormat('YYYY-MM-DD')).to.equal aMonthFromYesterday.toFormat('YYYY-MM-DD')
+
+        it 'should update user 11', ->
+          expect(mockUsers[11].payments.length).to.equal 1
+          expect(mockUsers[11].paidUntil.toFormat('YYYY-MM-DD')).to.equal aMonthFromYesterday.toFormat('YYYY-MM-DD')
+
+        it 'new payment one', ->
+          newPayment = mockUsers[10].payments[2]
+          expect(newPayment.made.toFormat("YYYY-MM-DD")).to.equal "2007-07-09"
+          expect(newPayment.amount).to.equal 10000
+          expect(newPayment.type).to.equal 'STO'
+
+        it 'new payment two', ->
+          newPayment = mockUsers[11].payments[0]
+          expect(newPayment.made.toFormat("YYYY-MM-DD")).to.equal "2007-07-12"
+          expect(newPayment.amount).to.equal 1001
+          expect(newPayment.type).to.equal 'BGC'
+
+        it 'should raise a warning', ->
+          expect(res).to.be.a 'object'
+          expect(res.warnings).to.exist
+          expect(res.warnings.length).to.equal 1
+          # Unknown user 12
+          expect(res.warnings[0]).to.match /unknown.* 12/i
+
+        done()
 
   it 'should work well', worksTest
   it 'should be idempotent', worksTest

@@ -67,9 +67,11 @@ _reconcile = ({User, Payment}, transactions, callback) ->
       data.subscriptionUntil.setMonth(data.subscriptionUntil.getMonth()+1)
       payment = Payment.create data
       user.addPayment payment
-      user.save()
-      return next()
-  async.each transactions, processTransaction, done
+      user.paidUntil = data.subscriptionUntil
+      user.save().done (err, res) ->
+        return next err if err
+        return next()
+  async.eachSeries transactions, processTransaction, done
 
 reconcile = ({User, Payment}, transactions, callback) ->
   # Only run one reconcile at a time to prevent conflicts

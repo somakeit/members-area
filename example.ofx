@@ -70,6 +70,15 @@ NEWFILEUID:NONE
             </STMTTRN>
             <STMTTRN>
               <TRNTYPE>OTHER
+              <DTPOSTED>20070712
+              <DTUSER>20070712
+              <TRNAMT>10.01
+              <FITID>980309001
+                <CHECKNUM>1025
+              <NAME>Kenny M000011 BGC
+            </STMTTRN>
+            <STMTTRN>
+              <TRNTYPE>OTHER
               <DTPOSTED>20070710
               <DTUSER>20070710
               <TRNAMT>10.00
