@@ -21,7 +21,8 @@
     "date-utils": "~1.2.12",
     "ofx": "~0.1.0",
     "underscore": "~1.4.4",
-    "async": "~0.2.8"
+    "async": "~0.2.8",
+    "mysql": "~2.0.0-alpha8"
   },
   "devDependencies": {
     "sqlite3": "~2.1.5",
