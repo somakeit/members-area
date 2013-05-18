@@ -41,8 +41,8 @@ parse = (filename, callback) ->
     output.sort (a, b) -> a.date - b.date
     callback null, output
 
-_reconcile = ({User, Payment}, transactions, callback) ->
-  result = {warnings:[]}
+_reconcile = ({User, Payment}, transactions, callback, dryRun=false) ->
+  result = {success:[], warnings:[], duplicates: []}
   done = (err) ->
     return callback err if err
     callback null, result
@@ -54,6 +54,7 @@ _reconcile = ({User, Payment}, transactions, callback) ->
         return next()
       for payment in user.payments
         if new Date(payment.made).toFormat('YYYY-MM-DD') is transaction.ymd and payment.amount is transaction.amount and payment.type is transaction.type
+          result.duplicates.push "Already added £#{transaction.amount/100} (#{transaction.type}) payment for user #{user.id} on #{transaction.ymd}, not adding again"
           return next()
       # type, amount, made, subscriptionFrom, subscriptionUntil, data
       data =
@@ -64,25 +65,30 @@ _reconcile = ({User, Payment}, transactions, callback) ->
         data: JSON.stringify({original: transaction})
       data.subscriptionUntil = new Date(data.subscriptionFrom)
       data.subscriptionUntil.setMonth(data.subscriptionUntil.getMonth()+1)
-      payment = Payment.build(data)
-      user.addPayment payment
-      user.paidUntil = data.subscriptionUntil
-      user.save().done (err, res) ->
-        return next err if err
+      result.success.push "Added £#{data.amount/100} (#{data.type}) payment for user #{user.id} on #{data.made.toFormat('YYYY-MM-DD')} to cover #{data.subscriptionFrom.toFormat('YYYY-MM-DD')} until #{data.subscriptionFrom.toFormat('YYYY-MM-DD')}."
+      if dryRun
         return next()
+      else
+        payment = Payment.build(data)
+        user.addPayment payment
+        user.paidUntil = data.subscriptionUntil
+        user.save().done (err, res) ->
+          return next err if err
+          return next()
   async.eachSeries transactions, processTransaction, done
 
-reconcile = ({User, Payment}, transactions, callback) ->
+reconcile = ({User, Payment}, transactions, callback, dryRun) ->
   # Only run one reconcile at a time to prevent conflicts
   reconcileQueue.addTask (done) ->
-    _reconcile {User, Payment}, transactions, ->
+    cb = ->
       callback.apply @, arguments
       done()
+    _reconcile {User, Payment}, transactions, cb, dryRun
 
-importAndReconcile = ({User, Payment}, filename, callback) ->
+importAndReconcile = ({User, Payment}, filename, callback, dryRun) ->
   parse filename, (err, transactions) ->
     return callback err if err?
-    reconcile {User, Payment}, transactions, callback
+    reconcile {User, Payment}, transactions, callback, dryRun
 
 module.exports = {parse, reconcile, importAndReconcile}
 
