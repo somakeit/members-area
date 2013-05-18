@@ -18,7 +18,7 @@ module.exports = (app) -> new class
         else
           response.render 'message', {title:"Success", text: "Imported with following warnings: #{result.warnings.join(", ")}"}
       return
-    r = req.Payment.findAll(include:['User'])
+    r = req.Payment.findAll(include:[req.User])
     r.success (payments) ->
       payments ?= []
       payments.sort (a, b) -> return +b.made - a.made

@@ -47,7 +47,7 @@ _reconcile = ({User, Payment}, transactions, callback) ->
     return callback err if err
     callback null, result
   processTransaction = (transaction, next) ->
-    req = User.find({include:['Payment'], where:{id:transaction.userId}}).done (err, user) ->
+    req = User.find({include:[Payment], where:{id:transaction.userId}}).done (err, user) ->
       return next err if err
       if !user?
         result.warnings.push "Unknown user: #{transaction.userId}"

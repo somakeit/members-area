@@ -107,7 +107,7 @@ describe 'reconciliation', ->
   class MockUser extends MockModel
     @find: ({where:{id}, include}) ->
       expect(include.length).to.equal 1
-      expect(include).to.include 'Payment'
+      expect(include).to.include MockPayment
 
       promise = new CustomEventEmitter (emitter) ->
         process.nextTick ->
