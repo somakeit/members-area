@@ -89,7 +89,7 @@ describe 'reconciliation', ->
       done()
 
   class MockModel
-    @create: (details) ->
+    @build: (details) ->
       return new @(details)
 
     constructor: (details) ->
@@ -105,9 +105,9 @@ describe 'reconciliation', ->
   class MockPayment extends MockModel
 
   class MockUser extends MockModel
-    @find: ({id, include}) ->
+    @find: ({where:{id}, include}) ->
       expect(include.length).to.equal 1
-      expect(include).to.include MockPayment
+      expect(include).to.include 'Payment'
 
       promise = new CustomEventEmitter (emitter) ->
         process.nextTick ->
@@ -145,6 +145,7 @@ describe 'reconciliation', ->
   worksTest = (done) ->
     importer.reconcile {User:MockUser, Payment:MockPayment}, transactions, (err, res) ->
       expect(err).to.not.exist
+      expect(res.warnings.length).to.equal 1
 
       describe 'results', ->
         it 'should not update user 1', ->
