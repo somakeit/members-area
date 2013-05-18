@@ -2,14 +2,14 @@ extends layout
 
 block content
   h2 Banking
-  //
-    form(method="post", enctype="multipart/form-data")
-      fieldset
-        legend Upload OFX
-        div
-          input(type="file", name="ofxfile")
-        div
-          button.btn(type="submit") Upload
+  form(method="post", enctype="multipart/form-data")
+    input(type='hidden', name='form', value='ofx')
+    fieldset
+      legend Upload OFX
+      div
+        input(type="file", name="ofxfile")
+      div
+        button.btn(type="submit") Upload
 
   h3 All transactions:
   table.table.table-striped

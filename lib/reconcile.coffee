@@ -47,13 +47,13 @@ _reconcile = ({User, Payment}, transactions, callback) ->
     return callback err if err
     callback null, result
   processTransaction = (transaction, next) ->
-    req = User.find({include:[Payment], id:transaction.userId}).done (err, user) ->
+    req = User.find({include:['Payment'], where:{id:transaction.userId}}).done (err, user) ->
       return next err if err
       if !user?
         result.warnings.push "Unknown user: #{transaction.userId}"
         return next()
       for payment in user.payments
-        if payment.made.toFormat('YYYY-MM-DD') is transaction.ymd and payment.amount is transaction.amount and payment.type is transaction.type
+        if new Date(payment.made).toFormat('YYYY-MM-DD') is transaction.ymd and payment.amount is transaction.amount and payment.type is transaction.type
           return next()
       # type, amount, made, subscriptionFrom, subscriptionUntil, data
       data =
@@ -61,11 +61,10 @@ _reconcile = ({User, Payment}, transactions, callback) ->
         amount: transaction.amount
         made: transaction.date
         subscriptionFrom: user.paidUntil ? user.approved
-        data:
-          original: transaction
+        data: JSON.stringify({original: transaction})
       data.subscriptionUntil = new Date(data.subscriptionFrom)
       data.subscriptionUntil.setMonth(data.subscriptionUntil.getMonth()+1)
-      payment = Payment.create data
+      payment = Payment.build(data)
       user.addPayment payment
       user.paidUntil = data.subscriptionUntil
       user.save().done (err, res) ->

@@ -1,10 +1,23 @@
+fs = require 'fs'
 gocardlessMod = require '../gocardless-client'
 gocardlessClient = gocardlessMod.client
+
+reconcile = require '../lib/reconcile'
 
 module.exports = (app) -> new class
   money: (req, response, next) ->
     if !response.locals.loggedInUser.admin
       return next()
+    if req.method is 'POST' and req.files?.ofxfile?
+      path = req.files.ofxfile.path
+      reconcile.importAndReconcile req, path, (err, result) ->
+        fs.unlink path
+        if err
+          console.error err
+          response.render 'message', {title:"Error", text: "Error occurred: #{err}"}
+        else
+          response.render 'message', {title:"Success", text: "Imported with following warnings: #{result.warnings.join(", ")}"}
+      return
     r = req.Payment.findAll(include:['User'])
     r.success (payments) ->
       payments ?= []
