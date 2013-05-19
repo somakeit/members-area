@@ -43,6 +43,8 @@ parse = (filename, callback) ->
 
 _reconcile = ({User, Payment}, transactions, callback, dryRun=false) ->
   result = {success:[], warnings:[], duplicates: []}
+  dryRun = !!dryRun
+  result.dryRun = dryRun
   done = (err) ->
     return callback err if err
     callback null, result
@@ -66,8 +68,11 @@ _reconcile = ({User, Payment}, transactions, callback, dryRun=false) ->
           made: transaction.date
           subscriptionFrom: user.paidUntil ? user.approved
           data: JSON.stringify({original: transaction})
-        data.subscriptionUntil = new Date(data.subscriptionFrom)
-        data.subscriptionUntil.setMonth(data.subscriptionUntil.getMonth()+1)
+        if transaction.until
+          data.subscriptionUntil = transaction.until
+        else
+          data.subscriptionUntil = new Date(data.subscriptionFrom)
+          data.subscriptionUntil.setMonth(data.subscriptionUntil.getMonth()+1)
         result.success.push "Added £#{data.amount/100} (#{data.type}) payment for member #{user.id} (#{user.username}) on #{data.made.toFormat('YYYY-MM-DD')} to cover #{data.subscriptionFrom.toFormat('YYYY-MM-DD')} until #{data.subscriptionUntil.toFormat('YYYY-MM-DD')}."
         if dryRun
           return next()

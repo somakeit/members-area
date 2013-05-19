@@ -1,30 +1,33 @@
 extends layout
 
-block content
-  h2 Banking
-  if ofxResults
-    if ofxResults.dryRun
+mixin showResults(results)
+  if results
+    if results.dryRun
       h3 DRY RUN results
     else
       h3 Results of import
     h4 Imported records
     ul
-      for text in ofxResults.success
+      for text in results.success
         li= text
       else
         li No imported records
     h4 Warnings
     ul
-      for text in ofxResults.warnings
+      for text in results.warnings
         li= text
       else
         li No warnings
     h4 Duplicate (not imported) records
     ul
-      for text in ofxResults.duplicates
+      for text in results.duplicates
         li= text
       else
         li No duplicates
+
+block content
+  h2 Banking
+  mixin showResults(ofxResults)
 
   form(method="post", enctype="multipart/form-data")
     input(type='hidden', name='form', value='ofx')
@@ -35,6 +38,14 @@ block content
       div
         button.btn(type="submit", name="dryRun", value="1") Dry-run
         button.btn(type="submit", name="commit", value="1") COMMIT
+
+  h3 GoCardless
+  mixin showResults(gocardlessResults)
+  form(method="post", enctype="multipart/form-data")
+    input(type='hidden', name='form', value='gocardless')
+    div
+      button.btn(type="submit", name="dryRun", value="1") Dry-run
+      button.btn(type="submit", name="commit", value="1") COMMIT
 
   h3 All transactions:
   table.table.table-striped

@@ -1,4 +1,6 @@
+require 'date-utils'
 fs = require 'fs'
+async = require 'async'
 gocardlessMod = require '../gocardless-client'
 gocardlessClient = gocardlessMod.client
 
@@ -8,13 +10,12 @@ module.exports = (app) -> new class
   money: (req, response, next) ->
     if !response.locals.loggedInUser.admin
       return next()
-    render = (results = null) ->
+    render = (ofxResults = null, gocardlessResults = null) ->
       r = req.Payment.findAll(include:[req.User])
       r.success (payments) ->
         payments ?= []
         payments.sort (a, b) -> return +b.made - a.made
         normal = response.locals.paymentColumns
-        console.log payments
         cols =
           user:
             t: "User"
@@ -22,7 +23,7 @@ module.exports = (app) -> new class
               v?.username ? "-"
         for k, v of normal
           cols[k] = v
-        response.render 'money', {title:"Banking", payments:payments, allPaymentColumns:cols, ofxResults: results}
+        response.render 'money', {title:"Banking", payments:payments, allPaymentColumns:cols, ofxResults: ofxResults, gocardlessResults: gocardlessResults}
       r.error (err) ->
         response.render 'message', {title:"Error", text: "Unknown error occurred, please try again later."}
     if req.method is 'POST' and req.files?.ofxfile?
@@ -33,14 +34,57 @@ module.exports = (app) -> new class
           console.error err
           response.render 'message', {title:"Error", text: "Error occurred: #{err}"}
         else
-          result.dryRun = dryRun
           render(result)
       dryRun = !req.body.commit
       if !!req.body.dryRun
         dryRun = true # Just in case they send both
       reconcile.importAndReconcile req, path, next, dryRun
       return
-    render()
+    else if req.method is 'POST' and req.body.form is 'gocardless'
+      dryRun = !req.body.commit
+      if !!req.body.dryRun
+        dryRun = true # Just in case they send both
+      gocardlessClient.apiGet "/merchants/#{gocardlessClient.merchant_id}/bills", (err, bills) ->
+        paidSubscriptions = []
+        done = ->
+          next = (err, results) ->
+            if err
+              response.render 'message', {title:"Error", text: "Error occurred: #{err}"}
+            else
+              render(null, results)
+          paidSubscriptions.sort (a, b) -> a.date - b.date
+          reconcile.reconcile req, paidSubscriptions, next, dryRun
+        processBill = (bill, next) ->
+          if bill.status is 'paid' and bill.source_type is 'subscription'
+            # Find out more
+            gocardlessClient.apiGet "/subscriptions/#{bill.source_id}", (err, subscription) ->
+              if subscription?
+                matches = subscription.name.match /^M0+([0-9]+)$/
+                if matches
+                  userId = parseInt matches[1], 10
+                  billCreated = new Date(bill.created_at)
+                  subscriptionStart = new Date(subscription.start_at)
+                  billCreatedPlusOneMonth = new Date(+billCreated)
+                  billCreatedPlusOneMonth.setMonth(billCreatedPlusOneMonth.getMonth()+1)
+                  transaction =
+                    userId: userId
+                    type: "GC"
+                    ymd: billCreated.toFormat 'YYYY-MM-DD'
+                    amount: parseInt(parseFloat(bill.amount) * 100, 10)
+                    date: billCreated
+                    data: {gocardlessBill:bill}
+                  isSetup = (billCreated < subscriptionStart)
+                  if isSetup
+                    transaction.until = subscriptionStart
+                  paidSubscriptions.push transaction
+              next()
+          else
+            next()
+
+        async.each bills, processBill, done
+
+    else
+      render()
     return
     response.locals.loggedInUser.getPayments().done (err, payments) ->
       if !err
