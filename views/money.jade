@@ -2,6 +2,30 @@ extends layout
 
 block content
   h2 Banking
+  if ofxResults
+    if ofxResults.dryRun
+      h3 DRY RUN results
+    else
+      h3 Results of import
+    h4 Imported records
+    ul
+      for text in ofxResults.success
+        li= text
+      else
+        li No imported records
+    h4 Warnings
+    ul
+      for text in ofxResults.warnings
+        li= text
+      else
+        li No warnings
+    h4 Duplicate (not imported) records
+    ul
+      for text in ofxResults.duplicates
+        li= text
+      else
+        li No duplicates
+
   form(method="post", enctype="multipart/form-data")
     input(type='hidden', name='form', value='ofx')
     fieldset
@@ -9,7 +33,8 @@ block content
       div
         input(type="file", name="ofxfile")
       div
-        button.btn(type="submit") Upload
+        button.btn(type="submit", name="dryRun", value="1") Dry-run
+        button.btn(type="submit", name="commit", value="1") COMMIT
 
   h3 All transactions:
   table.table.table-striped

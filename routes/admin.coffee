@@ -8,32 +8,39 @@ module.exports = (app) -> new class
   money: (req, response, next) ->
     if !response.locals.loggedInUser.admin
       return next()
+    render = (results = null) ->
+      r = req.Payment.findAll(include:[req.User])
+      r.success (payments) ->
+        payments ?= []
+        payments.sort (a, b) -> return +b.made - a.made
+        normal = response.locals.paymentColumns
+        console.log payments
+        cols =
+          user:
+            t: "User"
+            f: (v) ->
+              v?.username ? "-"
+        for k, v of normal
+          cols[k] = v
+        response.render 'money', {title:"Banking", payments:payments, allPaymentColumns:cols, ofxResults: results}
+      r.error (err) ->
+        response.render 'message', {title:"Error", text: "Unknown error occurred, please try again later."}
     if req.method is 'POST' and req.files?.ofxfile?
       path = req.files.ofxfile.path
-      reconcile.importAndReconcile req, path, (err, result) ->
+      next = (err, result) ->
         fs.unlink path
         if err
           console.error err
           response.render 'message', {title:"Error", text: "Error occurred: #{err}"}
         else
-          response.render 'message', {title:"Success", text: "Imported with following warnings: #{result.warnings.join(", ")}"}
+          result.dryRun = dryRun
+          render(result)
+      dryRun = !req.body.commit
+      if !!req.body.dryRun
+        dryRun = true # Just in case they send both
+      reconcile.importAndReconcile req, path, next, dryRun
       return
-    r = req.Payment.findAll(include:[req.User])
-    r.success (payments) ->
-      payments ?= []
-      payments.sort (a, b) -> return +b.made - a.made
-      normal = response.locals.paymentColumns
-      console.log payments
-      cols =
-        user:
-          t: "User"
-          f: (v) ->
-            v?.username ? "-"
-      for k, v of normal
-        cols[k] = v
-      response.render 'money', {title:"Banking", payments:payments, allPaymentColumns:cols}
-    r.error (err) ->
-      response.render 'message', {title:"Error", text: "Unknown error occurred, please try again later."}
+    render()
     return
     response.locals.loggedInUser.getPayments().done (err, payments) ->
       if !err
