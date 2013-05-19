@@ -51,8 +51,8 @@ describe 'OFX import', ->
           return true
       done()
 
-    it 'should contain 4 valid records', ->
-      expect(transactions.length).to.equal 4
+    it 'should contain 5 valid records', ->
+      expect(transactions.length).to.equal 5
       matched = 0
       for transaction in transactions
         if transaction.userId is 1
@@ -72,8 +72,11 @@ describe 'OFX import', ->
           expect(transaction.accountHolder).to.equal 'Kenny'
           expect(transaction.type).to.equal 'BGC'
           expect(transaction.amount).to.equal 1001
-          expect(transaction.ymd).to.equal "2007-07-12"
-      expect(matched).to.equal 3
+          if matched is 3
+            expect(transaction.ymd).to.equal "2007-07-12"
+          else if matched is 4
+            expect(transaction.ymd).to.equal "2007-08-12"
+      expect(matched).to.equal 4
 
     it 'should be in ascending date order', ->
       expect(transactions[0].date).to.be.lessThan transactions[1].date
@@ -95,6 +98,9 @@ describe 'reconciliation', ->
 
   aMonthFromYesterday = new Date(yesterday.getTime())
   aMonthFromYesterday.setMonth(aMonthFromYesterday.getMonth()+1)
+
+  twoMonthsFromYesterday = new Date(yesterday.getTime())
+  twoMonthsFromYesterday.setMonth(twoMonthsFromYesterday.getMonth()+2)
 
   createMocks = ->
     class MockModel
@@ -181,7 +187,7 @@ describe 'reconciliation', ->
     it 'should show successes', ->
       expect(res).to.be.a 'object'
       expect(res.success).to.exist
-      expect(res.success.length).to.equal 2
+      expect(res.success.length).to.equal 3
       # Unknown user 12
       expect(res.success[0]).to.match /.* 10/i
       expect(res.success[1]).to.match /.* 11/i
@@ -211,18 +217,28 @@ describe 'reconciliation', ->
         expect(mockUsers[10].paidUntil.toFormat('YYYY-MM-DD')).to.equal aMonthFromYesterday.toFormat('YYYY-MM-DD')
 
       it 'should update user 11', ->
-        expect(mockUsers[11].payments.length).to.equal 1
-        expect(mockUsers[11].paidUntil.toFormat('YYYY-MM-DD')).to.equal aMonthFromYesterday.toFormat('YYYY-MM-DD')
+        expect(mockUsers[11].payments.length).to.equal 2
+        expect(mockUsers[11].paidUntil.toFormat('YYYY-MM-DD')).to.equal twoMonthsFromYesterday.toFormat('YYYY-MM-DD')
 
-      it 'new payment one', ->
+      it 'should have parsed payment one', ->
         newPayment = mockUsers[10].payments[2]
         expect(newPayment.made.toFormat("YYYY-MM-DD")).to.equal "2007-07-09"
         expect(newPayment.amount).to.equal 10000
         expect(newPayment.type).to.equal 'STO'
 
-      it 'new payment two', ->
+      it 'should have parsed payment two', ->
         newPayment = mockUsers[11].payments[0]
         expect(newPayment.made.toFormat("YYYY-MM-DD")).to.equal "2007-07-12"
+        expect(newPayment.subscriptionFrom.toFormat('YYYY-MM-DD')).to.equal yesterday.toFormat('YYYY-MM-DD')
+        expect(newPayment.subscriptionUntil.toFormat('YYYY-MM-DD')).to.equal aMonthFromYesterday.toFormat('YYYY-MM-DD')
+        expect(newPayment.amount).to.equal 1001
+        expect(newPayment.type).to.equal 'BGC'
+
+      it 'should have parsed payment three', ->
+        newPayment = mockUsers[11].payments[1]
+        expect(newPayment.made.toFormat("YYYY-MM-DD")).to.equal "2007-08-12"
+        expect(newPayment.subscriptionFrom.toFormat('YYYY-MM-DD')).to.equal aMonthFromYesterday.toFormat('YYYY-MM-DD')
+        expect(newPayment.subscriptionUntil.toFormat('YYYY-MM-DD')).to.equal twoMonthsFromYesterday.toFormat('YYYY-MM-DD')
         expect(newPayment.amount).to.equal 1001
         expect(newPayment.type).to.equal 'BGC'
 
@@ -234,8 +250,8 @@ describe 'reconciliation', ->
         expect(res.warnings[0]).to.match /unknown.* 12/i
 
       if iteration > 0
-        it "should have skipped 3 entries", ->
-          expect(res.duplicates.length).to.equal 3
+        it "should have skipped 4 entries", ->
+          expect(res.duplicates.length).to.equal 4
 
         it "should have no successes", ->
           expect(res.success.length).to.equal 0
@@ -244,8 +260,8 @@ describe 'reconciliation', ->
         it "should have skipped 1 entry", ->
           expect(res.duplicates.length).to.equal 1
 
-        it "should have 2 successes", ->
-          expect(res.success.length).to.equal 2
+        it "should have 3 successes", ->
+          expect(res.success.length).to.equal 3
 
 
     describe 'first run', standardChecks(0)
