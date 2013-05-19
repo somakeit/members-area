@@ -47,34 +47,37 @@ _reconcile = ({User, Payment}, transactions, callback, dryRun=false) ->
     return callback err if err
     callback null, result
   processTransaction = (transaction, next) ->
-    req = User.find({include:[Payment], where:{id:transaction.userId}}).done (err, user) ->
+    req = User.find(transaction.userId).done (err, user) ->
       return next err if err
       if !user?
         result.warnings.push "Unknown member: £#{transaction.amount/100} (#{transaction.type}) payment for member #{transaction.userId} on #{transaction.ymd}, not adding"
         return next()
-      for payment in user.payments
-        if new Date(payment.made).toFormat('YYYY-MM-DD') is transaction.ymd and payment.amount is transaction.amount and payment.type is transaction.type
-          result.duplicates.push "Already added £#{transaction.amount/100} (#{transaction.type}) payment for member #{user.id} (#{user.username}) on #{transaction.ymd}, not adding again"
+      Payment.findAll({where:{UserId:user.id}}).done (err, userPayments) ->
+        return next err if err
+        for payment in userPayments
+          if new Date(payment.made).toFormat('YYYY-MM-DD') is transaction.ymd and payment.amount is transaction.amount and payment.type is transaction.type
+            result.duplicates.push "Already added £#{transaction.amount/100} (#{transaction.type}) payment for member #{user.id} (#{user.username}) on #{transaction.ymd}, not adding again"
+            return next()
+        # type, amount, made, subscriptionFrom, subscriptionUntil, data
+        data =
+          UserId: user.id
+          type: transaction.type
+          amount: transaction.amount
+          made: transaction.date
+          subscriptionFrom: user.paidUntil ? user.approved
+          data: JSON.stringify({original: transaction})
+        data.subscriptionUntil = new Date(data.subscriptionFrom)
+        data.subscriptionUntil.setMonth(data.subscriptionUntil.getMonth()+1)
+        result.success.push "Added £#{data.amount/100} (#{data.type}) payment for member #{user.id} (#{user.username}) on #{data.made.toFormat('YYYY-MM-DD')} to cover #{data.subscriptionFrom.toFormat('YYYY-MM-DD')} until #{data.subscriptionUntil.toFormat('YYYY-MM-DD')}."
+        if dryRun
           return next()
-      # type, amount, made, subscriptionFrom, subscriptionUntil, data
-      data =
-        type: transaction.type
-        amount: transaction.amount
-        made: transaction.date
-        subscriptionFrom: user.paidUntil ? user.approved
-        data: JSON.stringify({original: transaction})
-      data.subscriptionUntil = new Date(data.subscriptionFrom)
-      data.subscriptionUntil.setMonth(data.subscriptionUntil.getMonth()+1)
-      result.success.push "Added £#{data.amount/100} (#{data.type}) payment for member #{user.id} (#{user.username}) on #{data.made.toFormat('YYYY-MM-DD')} to cover #{data.subscriptionFrom.toFormat('YYYY-MM-DD')} until #{data.subscriptionUntil.toFormat('YYYY-MM-DD')}."
-      if dryRun
-        return next()
-      else
-        payment = Payment.build(data)
-        user.addPayment payment
-        user.paidUntil = data.subscriptionUntil
-        user.save().done (err, res) ->
-          return next err if err
-          return next()
+        else
+          Payment.create(data).done (err, payment) ->
+            return next err if err
+            user.paidUntil = data.subscriptionUntil
+            user.save().done (err, res) ->
+              return next err if err
+              return next()
   async.eachSeries transactions, processTransaction, done
 
 reconcile = ({User, Payment}, transactions, callback, dryRun) ->

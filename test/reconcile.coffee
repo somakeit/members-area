@@ -105,7 +105,16 @@ describe 'reconciliation', ->
   createMocks = ->
     class MockModel
       @build: (details) ->
-        return new @(details)
+        model = new @(details)
+        return model
+
+      @create: (details) ->
+        model = new @(details)
+        mockUsers[model.UserId]?.payments.push model
+        promise = new CustomEventEmitter (emitter) ->
+          process.nextTick ->
+            emitter.emit 'success', model
+        return promise.run()
 
       constructor: (details) ->
         for own k, v of details
@@ -118,11 +127,21 @@ describe 'reconciliation', ->
         return promise.run()
 
     class MockPayment extends MockModel
+      @findAll: ({where:{UserId}}) ->
+        result = mockUsers[UserId]?.payments ? []
+        promise = new CustomEventEmitter (emitter) ->
+          process.nextTick ->
+            emitter.emit 'success', result
+        return promise.run()
 
     class MockUser extends MockModel
-      @find: ({where:{id}, include}) ->
-        expect(include.length).to.equal 1
-        expect(include).to.include MockPayment
+      @find: (s) ->
+        if typeof s is 'object'
+          {where:{id}, include} = s
+          expect(include.length).to.equal 1
+          expect(include).to.include MockPayment
+        else
+          id = s
 
         promise = new CustomEventEmitter (emitter) ->
           process.nextTick ->
