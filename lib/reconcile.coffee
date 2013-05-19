@@ -65,7 +65,7 @@ _reconcile = ({User, Payment}, transactions, callback, dryRun=false) ->
         data: JSON.stringify({original: transaction})
       data.subscriptionUntil = new Date(data.subscriptionFrom)
       data.subscriptionUntil.setMonth(data.subscriptionUntil.getMonth()+1)
-      result.success.push "Added £#{data.amount/100} (#{data.type}) payment for member #{user.id} (#{user.username}) on #{data.made.toFormat('YYYY-MM-DD')} to cover #{data.subscriptionFrom.toFormat('YYYY-MM-DD')} until #{data.subscriptionFrom.toFormat('YYYY-MM-DD')}."
+      result.success.push "Added £#{data.amount/100} (#{data.type}) payment for member #{user.id} (#{user.username}) on #{data.made.toFormat('YYYY-MM-DD')} to cover #{data.subscriptionFrom.toFormat('YYYY-MM-DD')} until #{data.subscriptionUntil.toFormat('YYYY-MM-DD')}."
       if dryRun
         return next()
       else
