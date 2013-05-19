@@ -50,11 +50,11 @@ _reconcile = ({User, Payment}, transactions, callback, dryRun=false) ->
     req = User.find({include:[Payment], where:{id:transaction.userId}}).done (err, user) ->
       return next err if err
       if !user?
-        result.warnings.push "Unknown user: £#{transaction.amount/100} (#{transaction.type}) payment for user #{transaction.userId} on #{transaction.ymd}, not adding"
+        result.warnings.push "Unknown member: £#{transaction.amount/100} (#{transaction.type}) payment for member #{transaction.userId} on #{transaction.ymd}, not adding"
         return next()
       for payment in user.payments
         if new Date(payment.made).toFormat('YYYY-MM-DD') is transaction.ymd and payment.amount is transaction.amount and payment.type is transaction.type
-          result.duplicates.push "Already added £#{transaction.amount/100} (#{transaction.type}) payment for user #{user.id} on #{transaction.ymd}, not adding again"
+          result.duplicates.push "Already added £#{transaction.amount/100} (#{transaction.type}) payment for member #{user.id} (#{user.username}) on #{transaction.ymd}, not adding again"
           return next()
       # type, amount, made, subscriptionFrom, subscriptionUntil, data
       data =
@@ -65,7 +65,7 @@ _reconcile = ({User, Payment}, transactions, callback, dryRun=false) ->
         data: JSON.stringify({original: transaction})
       data.subscriptionUntil = new Date(data.subscriptionFrom)
       data.subscriptionUntil.setMonth(data.subscriptionUntil.getMonth()+1)
-      result.success.push "Added £#{data.amount/100} (#{data.type}) payment for user #{user.id} on #{data.made.toFormat('YYYY-MM-DD')} to cover #{data.subscriptionFrom.toFormat('YYYY-MM-DD')} until #{data.subscriptionFrom.toFormat('YYYY-MM-DD')}."
+      result.success.push "Added £#{data.amount/100} (#{data.type}) payment for member #{user.id} (#{user.username}) on #{data.made.toFormat('YYYY-MM-DD')} to cover #{data.subscriptionFrom.toFormat('YYYY-MM-DD')} until #{data.subscriptionFrom.toFormat('YYYY-MM-DD')}."
       if dryRun
         return next()
       else
