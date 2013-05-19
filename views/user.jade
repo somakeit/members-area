@@ -52,10 +52,8 @@ block content
             td
               select(name='type')
                 option(value='CASH', selected) CASH
-                option(value='BGC') BGC/Transfer
-                option(value='SO') Standing Order
                 option(value='PAYPAL') PayPal
-                option(value='DD') Direct Debit
+                option(value='OTHER') Other
               if error && error.type
                 if error.invalidType
                   p.text-error Invalid type of payment: '#{error.invalidType}'.
