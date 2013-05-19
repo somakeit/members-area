@@ -50,7 +50,7 @@ _reconcile = ({User, Payment}, transactions, callback, dryRun=false) ->
     req = User.find({include:[Payment], where:{id:transaction.userId}}).done (err, user) ->
       return next err if err
       if !user?
-        result.warnings.push "Unknown user: #{transaction.userId}"
+        result.warnings.push "Unknown user: £#{transaction.amount/100} (#{transaction.type}) payment for user #{transaction.userId} on #{transaction.ymd}, not adding"
         return next()
       for payment in user.payments
         if new Date(payment.made).toFormat('YYYY-MM-DD') is transaction.ymd and payment.amount is transaction.amount and payment.type is transaction.type
