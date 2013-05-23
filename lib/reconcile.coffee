@@ -68,12 +68,14 @@ _reconcile = ({User, Payment}, transactions, callback, dryRun=false) ->
           made: transaction.date
           subscriptionFrom: user.paidUntil ? user.approved
           data: JSON.stringify({original: transaction})
+        forced = ""
         if transaction.until
           data.subscriptionUntil = transaction.until
+          forced = "*"
         else
           data.subscriptionUntil = new Date(data.subscriptionFrom)
           data.subscriptionUntil.setMonth(data.subscriptionUntil.getMonth()+1)
-        result.success.push "Added £#{data.amount/100} (#{data.type}) payment for member #{user.id} (#{user.username}) on #{data.made.toFormat('YYYY-MM-DD')} to cover #{data.subscriptionFrom.toFormat('YYYY-MM-DD')} until #{data.subscriptionUntil.toFormat('YYYY-MM-DD')}."
+        result.success.push "Added £#{data.amount/100} (#{data.type}) payment for member #{user.id} (#{user.username}) on #{data.made.toFormat('YYYY-MM-DD')} to cover #{data.subscriptionFrom.toFormat('YYYY-MM-DD')} until #{forced}#{data.subscriptionUntil.toFormat('YYYY-MM-DD')}#{forced}."
         if dryRun
           return next()
         else

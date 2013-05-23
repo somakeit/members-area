@@ -72,9 +72,8 @@ module.exports = (app) -> new class
                     ymd: billCreated.toFormat 'YYYY-MM-DD'
                     amount: parseInt(parseFloat(bill.amount) * 100, 10)
                     date: billCreated
-                    data: {gocardlessBill:bill}
-                  isSetup = (billCreated < subscriptionStart)
-                  if isSetup
+                    data: {gocardlessBill:bill, gocardlessSubscription: subscription}
+                  if bill.is_setup_fee
                     transaction.until = subscriptionStart
                   paidSubscriptions.push transaction
               next()
