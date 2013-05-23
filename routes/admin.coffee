@@ -70,7 +70,7 @@ module.exports = (app) -> new class
                     userId: userId
                     type: "GC"
                     ymd: billCreated.toFormat 'YYYY-MM-DD'
-                    amount: parseInt(parseFloat(bill.amount) * 100, 10)
+                    amount: parseInt(parseFloat(bill.amount) * 100 - parseFloat(bill.gocardless_fees) * 100, 10)
                     date: billCreated
                     data: {gocardlessBill:bill, gocardlessSubscription: subscription}
                   transaction.status = switch bill.status
