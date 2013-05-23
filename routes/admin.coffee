@@ -55,7 +55,7 @@ module.exports = (app) -> new class
           paidSubscriptions.sort (a, b) -> a.date - b.date
           reconcile.reconcile req, paidSubscriptions, next, dryRun
         processBill = (bill, next) ->
-          if bill.status is 'paid' and bill.source_type is 'subscription'
+          if bill.source_type is 'subscription'
             # Find out more
             gocardlessClient.apiGet "/subscriptions/#{bill.source_id}", (err, subscription) ->
               if subscription?
@@ -73,6 +73,10 @@ module.exports = (app) -> new class
                     amount: parseInt(parseFloat(bill.amount) * 100, 10)
                     date: billCreated
                     data: {gocardlessBill:bill, gocardlessSubscription: subscription}
+                  transaction.status = switch bill.status
+                    when 'withdrawn' then 'received'
+                    when 'paid' then 'sent'
+                    else bill.status
                   if bill.is_setup_fee
                     transaction.until = subscriptionStart
                   paidSubscriptions.push transaction

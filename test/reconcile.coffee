@@ -126,6 +126,16 @@ describe 'reconciliation', ->
             emitter.emit 'success'
         return promise.run()
 
+      getData: ->
+        result = null
+        try
+          result = JSON.parse @data
+        result ?= {}
+        return result
+
+      setData: (data) ->
+        @data = JSON.stringify (data)
+
     class MockPayment extends MockModel
       @findAll: ({where:{UserId}}) ->
         result = mockUsers[UserId]?.payments ? []

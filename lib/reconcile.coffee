@@ -49,6 +49,7 @@ _reconcile = ({User, Payment}, transactions, callback, dryRun=false) ->
     return callback err if err
     callback null, result
   processTransaction = (transaction, next) ->
+    transaction.status ?= 'received'
     req = User.find(transaction.userId).done (err, user) ->
       return next err if err
       if !user?
@@ -58,8 +59,21 @@ _reconcile = ({User, Payment}, transactions, callback, dryRun=false) ->
         return next err if err
         for payment in userPayments
           if new Date(payment.made).toFormat('YYYY-MM-DD') is transaction.ymd and payment.amount is transaction.amount and payment.type is transaction.type
-            result.duplicates.push "Already added £#{transaction.amount/100} (#{transaction.type}) payment for member #{user.id} (#{user.username}) on #{transaction.ymd}, not adding again"
-            return next()
+            data = payment.getData()
+            if data.status isnt transaction.status
+              oldStatus = data.status
+              data.status = transaction.status
+              result.duplicates.push "Status transition '#{oldStatus}' -> '#{data.status}' for £#{transaction.amount/100} (#{transaction.type}) payment for member #{user.id} (#{user.username}) on #{transaction.ymd}"
+              if dryRun
+                return next()
+              payment.setData data
+              r = payment.save().done (err, res) ->
+                return next err if err
+                return next()
+            else
+              result.duplicates.push "Already added £#{transaction.amount/100} (#{transaction.type}) payment for member #{user.id} (#{user.username}) on #{transaction.ymd}, not adding again"
+              return next()
+            return
         # type, amount, made, subscriptionFrom, subscriptionUntil, data
         data =
           UserId: user.id
@@ -67,7 +81,7 @@ _reconcile = ({User, Payment}, transactions, callback, dryRun=false) ->
           amount: transaction.amount
           made: transaction.date
           subscriptionFrom: user.paidUntil ? user.approved
-          data: JSON.stringify({original: transaction})
+          data: JSON.stringify({original: transaction, status:transaction.status})
         forced = ""
         if transaction.until
           data.subscriptionUntil = transaction.until

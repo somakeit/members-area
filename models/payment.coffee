@@ -7,4 +7,14 @@ module.exports = (sequelize, DataTypes) ->
     subscriptionFrom: {type: DataTypes.DATE, allowNull: false}
     subscriptionUntil: {type: DataTypes.DATE, allowNull: false}
     data: {type:DataTypes.TEXT, allowNull: false} # JSON
-  }, {timestamps: true}
+  }, {
+    timestamps: true
+    instanceMethods:
+      getData: ->
+        data = null
+        try
+          data = JSON.parse @data
+        return data ? {}
+      setData: (data) ->
+        @data = JSON.stringify data
+  }
