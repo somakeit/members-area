@@ -59,7 +59,7 @@ module.exports = (app) -> new class
       if err.date or err.monthly or err.initial
         return render(req.body, err)
       # Go talk to GoCardless
-      addFee = (a) -> Math.ceil(100*100/99 * a)/100
+      addFee = (a) -> Math.round(100*100/99 * a)/100
       monthly = addFee monthly
       initial = addFee initial
       now = new Date()

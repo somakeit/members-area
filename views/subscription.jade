@@ -164,7 +164,7 @@ block content
           var amount = parseFloat(amount.value);
           if (!isNaN(amount)) {
             amount *= 100;
-            amount = Math.ceil(100/99 * amount);
+            amount = Math.round(100/99 * amount);
             amount = "" + Math.floor(amount/100) + "." + pad(amount % 100);
             after.textContent = amount;
           }
