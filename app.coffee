@@ -75,6 +75,10 @@ app.configure ->
           duration = diff + " month" + (if diff is 1 then "" else "s")
           from = formatDate entry.subscriptionFrom
           return "#{duration} from #{from}"
+      status:
+        t: 'Status'
+        f: (t, entry) ->
+          entry.getData().status ? 'received'
     next()
 
   app.use stylus.middleware
