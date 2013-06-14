@@ -144,9 +144,21 @@ module.exports = (app) -> self = new class
 
                 We're happy to inform you that your application to join So Make It was approved by #{req.session.fullname} and you are now on our Register of Members!
 
-                Welcome! Why not read more about the makerspace on our wiki?
+                Welcome aboard! 
+				
+				Why not say hi on IRC, put your project on our wiki, and come start making things!
 
-                http://wiki.somakeit.org.uk/
+				We can be found on IRC at irc.freenode.net #southackton and #somakeit
+
+				Sign up for the wiki at
+				
+				https://wiki.somakeit.org.uk/index.php5?title=Special:UserLogin&type=signup
+
+				Our opening times can be found at 
+
+				wiki.somakeit.org.uk
+
+
 
                 Kind regards,
 
