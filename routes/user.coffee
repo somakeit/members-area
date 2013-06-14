@@ -164,6 +164,27 @@ module.exports = (app) -> self = new class
 
                 The So Make It web team.
                 """
+			html: """
+
+                Hello #{user.fullname} (#{user.username}),
+
+                We're happy to inform you that your application to join So Make It was approved by #{req.session.fullname} and you are now on our Register of Members!
+
+                Welcome aboard! 
+				
+				Why not say hi on IRC, put your project on our wiki, and come start making things!
+
+				We can be found on IRC at irc.freenode.net #southackton and #somakeit
+
+				Sign up for the wiki <a href="https://wiki.somakeit.org.uk/index.php5?title=Special:UserLogin&type=signup">here</a> to add your project, or just help add knowledge.
+
+				Our opening times can be found <a href="http://wiki.somakeit.org.uk">on our wiki</a>
+
+
+
+                Kind regards,
+
+			"""
               }, (err, res) ->
                 if err
                   response.render 'message', {title: "Error", text: "Error sending email: #{err}"}
