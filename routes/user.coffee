@@ -214,7 +214,7 @@ https://wiki.somakeit.org.uk/wiki/Opening_Hours
 				We can be found on IRC at irc.freenode.net #southackton and #somakeit
 </p>
 <p>
-				Sign up for the wiki <a href="https://wiki.somakeit.org.uk/index.php5?title=Special:UserLogin&type=signup">here</a> to add your project, or just do some general updates (This is not yet integrated into the members area, but if you want to help out with that <a href="https://github.com/so-make-it/members-area")
+				Sign up for the wiki <a href="https://wiki.somakeit.org.uk/index.php5?title=Special:UserLogin&type=signup">here</a> to add your project, or just do some general updates (This is not yet integrated into the members area, but if you want to help out with that... <a href="https://github.com/so-make-it/members-area">go for it</a>)
 </p>
 <p>
 				Our opening times can be found <a href="https://wiki.somakeit.org.uk/wiki/Opening_Hours">on our wiki</a>
