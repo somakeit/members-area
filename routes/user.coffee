@@ -228,7 +228,7 @@ https://wiki.somakeit.org.uk/wiki/Opening_Hours
 				</p>
 				</body>
 				</html>
-                ""
+                """
               }, (err, res) ->
                 if err
                   response.render 'message', {title: "Error", text: "Error sending email: #{err}"}
