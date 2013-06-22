@@ -368,7 +368,7 @@ module.exports = (app) -> self = new class
       if err or !user.isApproved()
         res.send 404, {error: "Username or password do not match an existing approved account."}
       else
-        res.json {username: user.username, email: user.email}
+        res.json {id: user.id, username: user.username, email: user.email}
 
   auth: (req, response, next) ->
     response.locals.userId = null
