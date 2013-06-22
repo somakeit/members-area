@@ -363,6 +363,13 @@ module.exports = (app) -> self = new class
     else
       next()
 
+  me: (req, res) ->
+    req.User.findByPostBody req.body, (err, user) ->
+      if err or !user.isApproved()
+        res.send 404, {error: "Username or password do not match an existing approved account."}
+      else
+        res.json {username: user.username, email: user.email}
+
   auth: (req, response, next) ->
     response.locals.userId = null
     response.locals.loggedInUser = null
@@ -380,7 +387,7 @@ module.exports = (app) -> self = new class
           return next()
       else
         return next()
-    if req.session.userId? or ['/register', '/verify', '/forgot', '/reapply'].indexOf(req.path) isnt -1
+    if req.session.userId? or ['/register', '/verify', '/forgot', '/reapply', '/me'].indexOf(req.path) isnt -1
       return loggedIn()
     render = (opts = {}) ->
       opts.err ?= null
@@ -389,47 +396,31 @@ module.exports = (app) -> self = new class
       response.render 'login', opts
     if req.method is 'POST' and req.body.form is 'login' and req.body.email?
       # Check data
-      {email, password} = req.body
-      if email.match /@/
-        query = where:{email:email}
-      else
-        query = where:{username:email}
-      r = req.User.find(query)
-      r.error (err) ->
-        return render({data:req.body,err})
-      r.success (user) ->
-        if !user
-          return render {data:req.body,err:new Error()}
-        bcrypt.compare password, user.password, (err, res) ->
-          if err or !res
-            return render {data:req.body,err:new Error()}
-          else
-            data = {}
-            try
-              data = JSON.parse user.data
-            if user.approved? and user.approved.getFullYear() > 2012
-              req.session.userId = user.id
-              req.session.fullname = user.fullname
-              req.session.username = user.username
-              req.session.admin = user.admin
-              return loggedIn()
-            else if data?.rejected
-              req.body.form = 'reapply'
-              self.reapply(req, response, next)
-            else
-              subject = "Pending approval: account ##{user.id}"
-              response.render 'message',
-                title:"Awaiting approval"
-                html:
-                  """
-                  <p>
-                  Our trustees need to enter you onto our Register of Members
-                  before your account can be approved. If it's been more than 5
-                  days, please contact <a
-                  href="mailto:#{process.env.TRUSTEES_ADDRESS}?subject=#{encodeURIComponent
-                  subject}">#{process.env.TRUSTEES_ADDRESS}</a>.
-                  </p>
-                  """
+      req.User.findByPostBody req.body, (err, user) ->
+        return render({data:req.body,err}) if err?
+        if user.isApproved()
+          req.session.userId = user.id
+          req.session.fullname = user.fullname
+          req.session.username = user.username
+          req.session.admin = user.admin
+          return loggedIn()
+        else if user.isRejected()
+          req.body.form = 'reapply'
+          self.reapply(req, response, next)
+        else
+          subject = "Pending approval: account ##{user.id}"
+          response.render 'message',
+            title:"Awaiting approval"
+            html:
+              """
+              <p>
+              Our trustees need to enter you onto our Register of Members
+              before your account can be approved. If it's been more than 5
+              days, please contact <a
+              href="mailto:#{process.env.TRUSTEES_ADDRESS}?subject=#{encodeURIComponent
+              subject}">#{process.env.TRUSTEES_ADDRESS}</a>.
+              </p>
+              """
       return
     return render()
 

@@ -140,6 +140,9 @@ app.all '/verify', user.verify
 app.all '/forgot', user.forgot
 app.all '/reapply', user.reapply
 
+# API-like
+app.post '/me', user.me
+
 # Logged in
 app.all '/', dashboard.index
 app.all '/logout', user.logout
