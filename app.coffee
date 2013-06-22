@@ -142,6 +142,7 @@ app.all '/reapply', user.reapply
 
 # API-like
 app.post '/me', user.me
+app.get '/exists', user.exists
 
 # Logged in
 app.all '/', dashboard.index

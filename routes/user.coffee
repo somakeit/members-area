@@ -363,6 +363,18 @@ module.exports = (app) -> self = new class
     else
       next()
 
+  exists: (req, res) ->
+    username = req.query.username ? ""
+    query = where:{username:username}
+    r = req.User.find(query)
+    r.error (err) ->
+      res.json 404, {error: "Username doesn't exist"}
+    r.success (user) ->
+      if !user
+        res.json 404, {error: "Username doesn't exist"}
+      else
+        res.json {exists: true}
+
   me: (req, res) ->
     req.User.findByPostBody req.body, (err, user) ->
       if err or !user.isApproved()
@@ -387,7 +399,7 @@ module.exports = (app) -> self = new class
           return next()
       else
         return next()
-    if req.session.userId? or ['/register', '/verify', '/forgot', '/reapply', '/me'].indexOf(req.path) isnt -1
+    if req.session.userId? or ['/register', '/verify', '/forgot', '/reapply', '/me', '/exists'].indexOf(req.path) isnt -1
       return loggedIn()
     render = (opts = {}) ->
       opts.err ?= null
