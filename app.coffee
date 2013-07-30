@@ -154,6 +154,7 @@ app.all '/subscription/gocardless', subscription.gocardless
 app.all '/viewRegister', user.viewRegister
 app.all '/admin/money', admin.money
 app.all '/admin/reminders', admin.reminders
+app.all '/admin/emails', admin.emails
 
 handle501 = (req, res) ->
   res.statusCode = 501
