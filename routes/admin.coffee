@@ -46,7 +46,39 @@ module.exports = (app) -> new class
         dryRun = true # Just in case they send both
       gocardlessClient.apiGet "/merchants/#{gocardlessClient.merchant_id}/bills", (err, bills) ->
         paidSubscriptions = []
+        subscriptionsByUser = {}
         done = ->
+          updateGocardlessStatus = (userId) ->
+            userId = parseInt userId, 10
+            userRequest = req.User.find(userId)
+            userRequest.success (user) ->
+              data = user.getData()
+              changed = false
+              subscriptions = (value for key, value of subscriptionsByUser[userId])
+              for subscription, i in subscriptions by -1
+                if subscription.status isnt 'active'
+                  subscriptions.splice i, 1
+
+              sum = (key) ->
+                result = 0
+                for subscription in subscriptions
+                  result += parseFloat(subscription[key])
+                return result
+
+              data.gocardless ?= {}
+              updated =
+                initial: sum('setup_fee')
+                monthly: sum('amount')
+                subscriptions: subscriptions
+              data.gocardless[key] = value for key, value of updated
+              changed = true
+
+              if changed
+                user.setData data
+                user.save()
+
+          async.map Object.keys(subscriptionsByUser), updateGocardlessStatus, ->
+            # Meh, no action necessary
           next = (err, results) ->
             if err
               response.render 'message', {title:"Error", text: "Error occurred: #{err}"}
@@ -62,6 +94,8 @@ module.exports = (app) -> new class
                 matches = subscription.name.match /^M0+([0-9]+)$/
                 if matches
                   userId = parseInt matches[1], 10
+                  subscriptionsByUser[userId] ?= {}
+                  subscriptionsByUser[userId][subscription.id] = subscription
                   billCreated = new Date(bill.created_at)
                   subscriptionStart = new Date(subscription.start_at)
                   billCreatedPlusOneMonth = new Date(+billCreated)
