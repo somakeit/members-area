@@ -48,12 +48,13 @@ module.exports = (app) -> new class
         paidSubscriptions = []
         subscriptionsByUser = {}
         done = ->
-          updateGocardlessStatus = (userId) ->
+          updateGocardlessStatus = (userId, cb) ->
             userId = parseInt userId, 10
             userRequest = req.User.find(userId)
             userRequest.success (user) ->
+              oldData = user.data
               data = user.getData()
-              changed = false
+
               subscriptions = (value for key, value of subscriptionsByUser[userId])
               for subscription, i in subscriptions by -1
                 if subscription.status isnt 'active'
@@ -71,21 +72,21 @@ module.exports = (app) -> new class
                 monthly: sum('amount')
                 subscriptions: subscriptions
               data.gocardless[key] = value for key, value of updated
-              changed = true
 
-              if changed
-                user.setData data
-                user.save()
+              user.setData data
+              if user.data isnt oldData
+                user.save().done(cb)
+              else
+                process.nextTick cb
 
-          async.map Object.keys(subscriptionsByUser), updateGocardlessStatus, ->
-            # Meh, no action necessary
           next = (err, results) ->
             if err
               response.render 'message', {title:"Error", text: "Error occurred: #{err}"}
             else
               render(null, results)
           paidSubscriptions.sort (a, b) -> a.date - b.date
-          reconcile.reconcile req, paidSubscriptions, next, dryRun
+          async.map Object.keys(subscriptionsByUser), updateGocardlessStatus, ->
+            reconcile.reconcile req, paidSubscriptions, next, dryRun
         processBill = (bill, next) ->
           if bill.source_type is 'subscription'
             # Find out more
