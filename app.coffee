@@ -7,6 +7,7 @@ stylus = require('stylus')
 fs = require 'fs'
 net = require 'net'
 winston = require 'winston'
+FSStore = require('./lib/connect-fs')(express)
 
 process.chdir __dirname
 
@@ -16,6 +17,8 @@ models = require './models'
 
 try
   fs.mkdirSync 'log'
+try
+  fs.mkdirSync 'sessions'
 
 winston.remove winston.transports.Console
 winston.add winston.transports.Console, timestamp: true, colorize: true
@@ -127,7 +130,10 @@ app.configure ->
   app.use express.bodyParser()
   app.use express.methodOverride()
   app.use express.cookieParser(process.env.SECRET ? 'your secret here')
-  app.use express.session()
+  app.use express.session
+    store: new FSStore
+    secret: process.env.SECRET ? 'your secret'
+    cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 } # 1 week
   app.use user.auth
   app.use app.router
 
