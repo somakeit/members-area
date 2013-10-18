@@ -54,46 +54,47 @@ passport.use new LocalStrategy((username, password, done) ->
  * GitHub Auth
 ###
 
-passport.use new GitHubStrategy(
-  clientID: env.GITHUB_CLIENT_ID
-  clientSecret: env.GITHUB_CLIENT_SECRET
-  callbackURL: env.SERVER_ADDRESS + '/auth/github/callback'
-, (accessToken, refreshToken, profile, done) ->
-  User.findOrCreate
-    githubId: profile.id
-  , (err, user) ->
+if env.GITHUB_ID and env.GITHUB_SECRET
+  passport.use new GitHubStrategy(
+    clientID: env.GITHUB_CLIENT_ID
+    clientSecret: env.GITHUB_CLIENT_SECRET
+    callbackURL: env.SERVER_ADDRESS + '/auth/github/callback'
+  , (accessToken, refreshToken, profile, done) ->
+    User.findOrCreate
+      githubId: profile.id
+    , (err, user) ->
     done err, user
-
-)
+  )
 
 ###*
  * Facebook Auth
 ###
 
-passport.use new FacebookStrategy(
-  clientID: env.FACEBOOK_APP_ID
-  clientSecret: env.FACEBOOK_APP_SECRET
-  callbackURL: env.SERVER_ADDRESS + '/auth/facebook/callback'
-, (accessToken, refreshToken, profile, done) ->
-  User.findOrCreate "bob", (err, user) ->
-    return done(err)  if err
-    done null, user
-)
+if env.FACEBOOK_ID and env.FACEBOOK_SECRET
+  passport.use new FacebookStrategy(
+    clientID: env.FACEBOOK_ID
+    clientSecret: env.FACEBOOK_SECRET
+    callbackURL: env.SERVER_ADDRESS + '/auth/facebook/callback'
+  , (accessToken, refreshToken, profile, done) ->
+    User.findOrCreate "bob", (err, user) ->
+      return done(err)  if err
+      done null, user
+  )
 
 ###*
  * Twitter Auth
 ###
 
-passport.use new TwitterStrategy(
-  consumerKey: env.TWITTER_CONSUMER_KEY
-  consumerSecret: env.TWITTER_CONSUMER_SECRET
-  callbackURL: env.SERVER_ADDRESS + "/auth/twitter/callback"
-, (token, tokenSecret, profile, done) ->
-  User.findOrCreate "bob", (err, user) ->
-    return done(err)  if err
-    done null, user
-
-)
+if env.TWITTER_KEY and env.TWITTER_SECRET
+  passport.use new TwitterStrategy(
+    consumerKey: env.TWITTER_CONSUMER_KEY
+    consumerSecret: env.TWITTER_CONSUMER_SECRET
+    callbackURL: env.SERVER_ADDRESS + "/auth/twitter/callback"
+  , (token, tokenSecret, profile, done) ->
+    User.findOrCreate "bob", (err, user) ->
+      return done(err)  if err
+      done null, user
+  )
 
 ###*
  * Exports
