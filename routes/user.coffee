@@ -718,6 +718,20 @@ module.exports = (app) -> self = new class
 
     render()
 
+  account: (req, res, next) ->
+    r = req.User.find
+      where:
+        id: req.session.userId
+      attributes: ['id', 'facebookId', 'githubId', 'twitterId']
+    r.error (err) ->
+      req.error "Error occurred listing users."
+      req.error err
+      response.render 'message', {title:"Error", text: "Unknown error occurred, please try again later."}
+    r.success (model) ->
+      res.render 'account',
+        account: model.toJSON()
+        title: 'Account'
+
   viewRegister: (req, response, next) ->
     return next() unless req.session.admin
     query =

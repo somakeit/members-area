@@ -141,6 +141,23 @@ app.all '/verify', user.verify
 app.all '/forgot', user.forgot
 app.all '/reapply', user.reapply
 
+# Social auth
+app.get "/auth/facebook", passport.authenticate("facebook")
+app.get "/auth/facebook/callback", passport.authenticate("facebook",
+  successRedirect: "/"
+  failureRedirect: "/login"
+)
+app.get "/auth/github", passport.authenticate("github")
+app.get "/auth/github/callback", passport.authenticate("github",
+  successRedirect: "/"
+  failureRedirect: "/login"
+)
+app.get "/auth/facebook", passport.authenticate("twitter")
+app.get "/auth/twitter/callback", passport.authenticate("twitter",
+  successRedirect: "/"
+  failureRedirect: "/login"
+)
+
 # API-like
 app.post '/me', user.me
 app.get '/exists', user.exists
@@ -149,6 +166,7 @@ app.get '/exists', user.exists
 app.all '/', dashboard.index
 app.all '/logout', user.logout
 app.all '/user', user.list
+app.all '/account', user.account
 app.all '/user/:userId', user.view
 app.all '/subscription', subscription.index
 app.all '/subscription/gocardless', subscription.gocardless

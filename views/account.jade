@@ -1,0 +1,34 @@
+extends layout
+
+block content
+  h2 Account
+
+  h4 Social Authentication
+
+  table.table
+    thead
+      tr
+        th Service
+        th Connected
+    tbody
+      tr
+        td Facebook
+        td
+          if account.facebookId
+            a.btn.btn-small.btn-success(href="/auth/facebook") Connected
+          else
+            a.btn.btn-small.btn-primary(href="/auth/facebook") Connect
+      tr
+        td GitHub
+        td
+          if account.githubId
+            a.btn.btn-small.btn-success(href="/auth/github") Connected
+          else
+            a.btn.btn-small.btn-primary(href="/auth/github") Connect
+      tr
+        td Twitter
+        td
+          if account.twitterId
+            a.btn.btn-small.btn-success(href="/auth/twitter") Connected
+          else
+            a.btn.btn-small.btn-primary(href="/auth/twitter") Connect
