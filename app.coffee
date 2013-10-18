@@ -7,6 +7,7 @@ stylus = require('stylus')
 fs = require 'fs'
 net = require 'net'
 winston = require 'winston'
+passport = require './passport'
 
 process.chdir __dirname
 

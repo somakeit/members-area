@@ -12,7 +12,10 @@ module.exports = (sequelize, DataTypes) ->
     address: {type: DataTypes.TEXT, allowNull: false}
     wikiname: {type: DataTypes.STRING, allowNull:true}
     approved: {type: DataTypes.DATE, allowNull: true}
-    data: {type:DataTypes.TEXT, allowNull: false}
+    data: {type:DataTypes.TEXT, allowNull: false},
+    facebookId: {type: DataTypes.INTEGER, unique: true},
+    twitterId: {type: DataTypes.INTEGER, unique: true},
+    githubId: {type: DataTypes.INTEGER, unique: true}
   }, {
     timestamps: true
     classMethods:
