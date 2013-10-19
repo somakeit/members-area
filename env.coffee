@@ -29,3 +29,6 @@ if missing.length
 unless process.env.SERVER_ADDRESS.match /^http.*[^/]$/
   winston.error "Server address must not end in /"
   process.exit 1
+
+
+module.exports = process.env
