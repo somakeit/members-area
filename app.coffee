@@ -29,6 +29,7 @@ user = require('./routes/user')(app)
 dashboard = require('./routes/dashboard')(app)
 subscription = require('./routes/subscription')(app)
 admin = require('./routes/admin')(app)
+auth = require './routes/auth'
 
 stylusCompile = (str, path) ->
   return stylus(str)
@@ -143,80 +144,14 @@ app.all '/forgot', user.forgot
 app.all '/reapply', user.reapply
 
 # Social auth
-app.get "/auth/facebook", passport.authenticate("facebook")
-app.get "/auth/facebook/callback", passport.authenticate("facebook"), (req, res, next) ->
+app.get '/auth/facebook', passport.authenticate('facebook')
+app.get '/auth/facebook/callback', passport.authenticate('facebook'), auth.socialProvider('facebook')
 
-  r = req.User.find where:{facebookId:req.user.id}
-  r.error next
-  r.success  (user) ->
-    if user
-      if user.isApproved()
-          req.session.userId = user.id
-          req.session.fullname = user.fullname
-          req.session.username = user.username
-          req.session.admin = user.admin
-      res.redirect '/'
-    else if req.session.userId
-      r = req.User.find(req.session.userId)
-      r.success (user) ->
-        user.facebookId = req.user.id
-        r = user.save()
-        r.success  (user) ->
-          res.redirect '/account'
-        r.error next
-      r.error next
-    else
-      res.redirect '/login'
+app.get '/auth/github', passport.authenticate('github')
+app.get '/auth/github/callback', passport.authenticate('github'), auth.socialProvider('github')
 
-app.get "/auth/github", passport.authenticate("github")
-app.get "/auth/github/callback", passport.authenticate("github"), (req, res, next) ->
-
-  r = req.User.find where:{githubId:req.user.id}
-  r.error next
-  r.success  (user) ->
-    if user
-      if user.isApproved()
-          req.session.userId = user.id
-          req.session.fullname = user.fullname
-          req.session.username = user.username
-          req.session.admin = user.admin
-      res.redirect '/'
-    else if req.session.userId
-      r = req.User.find(req.session.userId)
-      r.success (user) ->
-        user.githubId = req.user.id
-        r = user.save()
-        r.success  (user) ->
-          res.redirect '/account'
-        r.error next
-      r.error next
-    else
-      res.redirect '/login'
-
-app.get "/auth/twitter", passport.authenticate("twitter")
-app.get "/auth/twitter/callback", passport.authenticate("twitter"), (req, res, next) ->
-
-  r = req.User.find where:{twitterId:req.user.id}
-  r.error next
-  r.success  (user) ->
-    if user
-      if user.isApproved()
-          req.session.userId = user.id
-          req.session.fullname = user.fullname
-          req.session.username = user.username
-          req.session.admin = user.admin
-      res.redirect '/'
-    else if req.session.userId
-      r = req.User.find(req.session.userId)
-      r.success (user) ->
-        user.twitterId = req.user.id
-        r = user.save()
-        r.success  (user) ->
-          res.redirect '/account'
-        r.error next
-      r.error next
-    else
-      res.redirect '/login'
+app.get '/auth/twitter', passport.authenticate('twitter')
+app.get '/auth/twitter/callback', passport.authenticate('twitter'), auth.socialProvider('twitter')
 
 # API-like
 app.post '/me', user.me
