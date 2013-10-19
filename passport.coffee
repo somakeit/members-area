@@ -28,42 +28,17 @@ passport.deserializeUser = (id, done) ->
     done null, user
   query.error done
 
-
-###*
- * Local Auth
-###
-
-passport.use new LocalStrategy((username, password, done) ->
-  User.findOne
-    username: username
-  , (err, user) ->
-    return done(err)  if err
-    unless user
-      return done(null, false,
-        message: 'Incorrect username.'
-      )
-    unless user.validPassword(password)
-      return done(null, false,
-        message: 'Incorrect password.'
-      )
-    done null, user
-
-)
-
 ###*
  * GitHub Auth
 ###
 
 if env.GITHUB_ID and env.GITHUB_SECRET
   passport.use new GitHubStrategy(
-    clientID: env.GITHUB_CLIENT_ID
-    clientSecret: env.GITHUB_CLIENT_SECRET
+    clientID: env.GITHUB_ID
+    clientSecret: env.GITHUB_SECRET
     callbackURL: env.SERVER_ADDRESS + '/auth/github/callback'
   , (accessToken, refreshToken, profile, done) ->
-    User.findOrCreate
-      githubId: profile.id
-    , (err, user) ->
-    done err, user
+    done null, profile
   )
 
 ###*
@@ -76,9 +51,7 @@ if env.FACEBOOK_ID and env.FACEBOOK_SECRET
     clientSecret: env.FACEBOOK_SECRET
     callbackURL: env.SERVER_ADDRESS + '/auth/facebook/callback'
   , (accessToken, refreshToken, profile, done) ->
-    User.findOrCreate "bob", (err, user) ->
-      return done(err)  if err
-      done null, user
+      done null, profile
   )
 
 ###*
@@ -86,14 +59,13 @@ if env.FACEBOOK_ID and env.FACEBOOK_SECRET
 ###
 
 if env.TWITTER_KEY and env.TWITTER_SECRET
+  console.log 'registering twitter'
   passport.use new TwitterStrategy(
-    consumerKey: env.TWITTER_CONSUMER_KEY
-    consumerSecret: env.TWITTER_CONSUMER_SECRET
+    consumerKey: env.TWITTER_KEY
+    consumerSecret: env.TWITTER_SECRET
     callbackURL: env.SERVER_ADDRESS + "/auth/twitter/callback"
   , (token, tokenSecret, profile, done) ->
-    User.findOrCreate "bob", (err, user) ->
-      return done(err)  if err
-      done null, user
+    done null, profile
   )
 
 ###*
