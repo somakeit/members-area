@@ -103,6 +103,36 @@ module.exports = (app) -> self = new class
 
               The So Make It web team.
               """
+            html: """
+				    <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" 
+				    "http://www.w3.org/TR/1999/REC-html401-19991224/frameset.dtd">
+				    <html>
+				    <head>
+				    </head>
+				    <body>
+				    <img src="https://members.somakeit.org.uk/img/header.png" alt="So Make It" />
+				    <p>
+                <b>Hello #{user.fullname} (#{user.username})</b>,<br />
+				    <br />
+				    </p>
+				    <p>
+				    We are sorry to inform you that you application to join So Make It has been rejected.<br/>
+				    The person who reviewed your application was #{req.session.fullname}, and they gave the following reasons:
+				    </p>
+				    <p>
+				    ---<br />
+				    #{req.body.message}<br />
+				    ---<br />
+				    </p>
+				    <p>
+                Kind regards,
+				    </p>
+				    <p>
+				    The So Make It web team
+				    </p>
+				    </body>
+				    </html>
+			      """
             }, (err, res) ->
               if err
                 response.render 'message', {title: "Error", text: "Error sending email: #{err}"}
@@ -140,17 +170,64 @@ module.exports = (app) -> self = new class
               bcc: "#{process.env.TRUSTEES_ADDRESS}"
               subject: "So Make It approval"
               text: """
-                Hello #{user.fullname} (#{user.username}),
+              Hello #{user.fullname} (#{user.username}),
 
                 We're happy to inform you that your application to join So Make It was approved by #{req.session.fullname} and you are now on our Register of Members!
 
-                Welcome! Why not read more about the makerspace on our wiki?
+                Welcome aboard! 
+				
+				Why not say hi on IRC, put your project on our wiki, and come start making things!
 
-                http://wiki.somakeit.org.uk/
+				We can be found on IRC at irc.freenode.net #southackton and #somakeit
+
+				Sign up for the wiki at
+				
+				https://wiki.somakeit.org.uk/index.php5?title=Special:UserLogin&type=signup
+
+				Our opening times can be found at 
+
+https://wiki.somakeit.org.uk/wiki/Opening_Hours
+
 
                 Kind regards,
 
                 The So Make It web team.
+                """
+              html: """
+				<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" 
+				"http://www.w3.org/TR/1999/REC-html401-19991224/frameset.dtd">
+				<html>
+				<head>
+				</head>
+				<body>
+				<img src="https://members.somakeit.org.uk/img/header.png" alt="So Make It" />
+				<p>
+                <b>Hello #{user.fullname} (#{user.username})</b>,<br />
+				<br />
+                We're happy to inform you that your application to join So Make It was <b style="color:green">approved</b> by #{req.session.fullname} and you are now on our Register of Members!
+				</p>
+                <p>
+				Welcome aboard! 
+				</p>
+				<p>
+				Why not say hi on IRC, put your project on our wiki, and come start making things!<br />
+				We can be found on IRC at irc.freenode.net #southackton and #somakeit
+</p>
+<p>
+        Sign up for the wiki <a href="https://wiki.somakeit.org.uk/index.php5?title=Special:UserLogin&type=signup">here</a> to add your project, or just do some general updates (This is not yet integrated into the members area, but if you want to help out with that... <a href="https://github.com/so-make-it/members-area">go for it</a>)
+</p>
+<p>
+				Our opening times can be found <a href="https://wiki.somakeit.org.uk/wiki/Opening_Hours">on our wiki</a>
+</p>
+<p>
+<br />
+                Kind regards,
+				</p>
+				<p>
+				The So Make It web team
+				</p>
+				</body>
+				</html>
                 """
               }, (err, res) ->
                 if err
