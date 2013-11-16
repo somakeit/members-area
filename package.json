@@ -22,7 +22,12 @@
     "ofx": "~0.1.1",
     "underscore": "~1.4.4",
     "async": "~0.2.8",
-    "mysql": "~2.0.0-alpha8"
+    "mysql": "~2.0.0-alpha8",
+    "passport": "~0.1.17",
+    "passport-github": "~0.1.5",
+    "passport-local": "~0.1.6",
+    "passport-facebook": "~0.1.5",
+    "passport-twitter": "~0.1.5"
   },
   "devDependencies": {
     "sqlite3": "~2.1.5",

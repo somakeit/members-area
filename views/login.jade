@@ -17,6 +17,11 @@ block body
           if err
             p.text-error Email or password incorrect
           button.btn.btn-primary.btn-large(type='submit') Sign in
+        span With: 
+        a.register(href="/auth/facebook") Facebook 
+        a.register(href="/auth/github") GitHub 
+        a.register(href="/auth/twitter") Twitter 
+        br
         a.register(href="/forgot") Forgot password?
         br
         br
