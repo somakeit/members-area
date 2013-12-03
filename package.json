@@ -1,6 +1,6 @@
 {
   "name": "members-area",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "scripts": {
     "start": "node_modules/.bin/coffee -c -m .; node app.js",
