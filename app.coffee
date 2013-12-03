@@ -7,12 +7,14 @@ stylus = require('stylus')
 fs = require 'fs'
 net = require 'net'
 winston = require 'winston'
-passport = require './passport'
 
 process.chdir __dirname
 
 # Fix/load/check environmental variables
 require './env'
+
+passport = require './passport'
+
 models = require './models'
 
 try
