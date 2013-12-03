@@ -59,7 +59,6 @@ if env.FACEBOOK_ID and env.FACEBOOK_SECRET
 ###
 
 if env.TWITTER_KEY and env.TWITTER_SECRET
-  console.log 'registering twitter'
   passport.use new TwitterStrategy(
     consumerKey: env.TWITTER_KEY
     consumerSecret: env.TWITTER_SECRET
