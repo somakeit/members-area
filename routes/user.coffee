@@ -475,7 +475,7 @@ module.exports = (app) -> self = new class
           return next()
       else
         return next()
-    if req.session.userId? or ['/register', '/verify', '/forgot', '/reapply', '/me', '/exists'].indexOf(req.path) isnt -1
+    if req.session.userId? or ['/register', '/verify', '/forgot', '/reapply', '/me', '/exists', '/auth/facebook', '/auth/facebook/callback', '/auth/github', '/auth/github/callback', '/auth/twitter', '/auth/twitter/callback'].indexOf(req.path) isnt -1
       return loggedIn()
     render = (opts = {}) ->
       opts.err ?= null
@@ -793,6 +793,20 @@ module.exports = (app) -> self = new class
 
 
     render()
+
+  account: (req, res, next) ->
+    r = req.User.find
+      where:
+        id: req.session.userId
+      attributes: ['id', 'facebookId', 'githubId', 'twitterId']
+    r.error (err) ->
+      req.error "Error occurred listing users."
+      req.error err
+      response.render 'message', {title:"Error", text: "Unknown error occurred, please try again later."}
+    r.success (model) ->
+      res.render 'account',
+        account: model.toJSON()
+        title: 'Account'
 
   viewRegister: (req, response, next) ->
     return next() unless req.session.admin

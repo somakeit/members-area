@@ -12,6 +12,9 @@ process.chdir __dirname
 
 # Fix/load/check environmental variables
 require './env'
+
+passport = require './passport'
+
 models = require './models'
 
 try
@@ -28,6 +31,7 @@ user = require('./routes/user')(app)
 dashboard = require('./routes/dashboard')(app)
 subscription = require('./routes/subscription')(app)
 admin = require('./routes/admin')(app)
+auth = require './routes/auth'
 
 stylusCompile = (str, path) ->
   return stylus(str)
@@ -128,6 +132,7 @@ app.configure ->
   app.use express.methodOverride()
   app.use express.cookieParser(process.env.SECRET ? 'your secret here')
   app.use express.session()
+  app.use passport.initialize()
   app.use user.auth
   app.use app.router
 
@@ -140,6 +145,16 @@ app.all '/verify', user.verify
 app.all '/forgot', user.forgot
 app.all '/reapply', user.reapply
 
+# Social auth
+app.get '/auth/facebook', passport.authenticate('facebook')
+app.get '/auth/facebook/callback', passport.authenticate('facebook'), auth.socialProvider('facebook')
+
+app.get '/auth/github', passport.authenticate('github')
+app.get '/auth/github/callback', passport.authenticate('github'), auth.socialProvider('github')
+
+app.get '/auth/twitter', passport.authenticate('twitter')
+app.get '/auth/twitter/callback', passport.authenticate('twitter'), auth.socialProvider('twitter')
+
 # API-like
 app.post '/me', user.me
 app.get '/exists', user.exists
@@ -148,6 +163,7 @@ app.get '/exists', user.exists
 app.all '/', dashboard.index
 app.all '/logout', user.logout
 app.all '/user', user.list
+app.all '/account', user.account
 app.all '/user/:userId', user.view
 app.all '/subscription', subscription.index
 app.all '/subscription/gocardless', subscription.gocardless
