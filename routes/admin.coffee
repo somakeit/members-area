@@ -140,3 +140,18 @@ module.exports = (app) -> new class
       response.render 'reminders', {title: "Reminders", users: users, bcc: process.env.TRUSTEES_ADDRESS, body: body}
     r.error (err) ->
       response.render 'message', {title:"Error", text: "Unknown error occurred, please try again later."}
+  emails: (req, response, next) ->
+    if !response.locals.loggedInUser.admin
+      return next()
+    query = {where:"approved IS NOT NULL AND approved > '2013-01-01'"}
+    r = req.User.findAll(query)
+    r.success (users) ->
+      emails = []
+      for user in users
+        emails.push "#{user.fullname}, #{user.email}"
+      text = emails.join("\n")
+      response.header "Content-Length", text.length
+      response.header "Content-Disposition", "attachment; filename=members.csv"
+      response.send text
+    r.error (err) ->
+      response.render 'message', {title:"Error", text: "Unknown error occurred, please try again later."}

@@ -39,6 +39,12 @@ GOCARDLESS_APP_ID=
 GOCARDLESS_APP_SECRET=
 GOCARDLESS_MERCHANT=
 GOCARDLESS_TOKEN=
+FACEBOOK_ID=
+FACEBOOK_SECRET=
+GITHUB_ID=
+GITHUB_SECRET=
+TWITTER_KEY=
+TWITTER_SECRET=
 ```
 
 (Set `NODE_ENV` to `development` to get logging on the console/etc;
@@ -60,3 +66,17 @@ file which will cause the server to restart automatically.)
 
 ### Open your browser
 To [http://localhost:1337](http://localhost:1337) and you should have it running :)
+
+### Migrations
+
+#### 0.2.0 > 0.3.0
+
+Added social features thanks to [@bencevans][]; requires a minor DB
+migration:
+
+    ALTER TABLE Users ADD COLUMN facebookId INT;
+    ALTER TABLE Users ADD COLUMN twitterId INT;
+    ALTER TABLE Users ADD COLUMN githubId INT;
+
+
+[@bencevans]: https://github.com/bencevans

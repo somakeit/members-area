@@ -104,35 +104,35 @@ module.exports = (app) -> self = new class
               The So Make It web team.
               """
             html: """
-				    <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" 
-				    "http://www.w3.org/TR/1999/REC-html401-19991224/frameset.dtd">
-				    <html>
-				    <head>
-				    </head>
-				    <body>
-				    <img src="https://members.somakeit.org.uk/img/header.png" alt="So Make It" />
-				    <p>
-                <b>Hello #{user.fullname} (#{user.username})</b>,<br />
-				    <br />
-				    </p>
-				    <p>
-				    We are sorry to inform you that you application to join So Make It has been rejected.<br/>
-				    The person who reviewed your application was #{req.session.fullname}, and they gave the following reasons:
-				    </p>
-				    <p>
-				    ---<br />
-				    #{req.body.message}<br />
-				    ---<br />
-				    </p>
-				    <p>
-                Kind regards,
-				    </p>
-				    <p>
-				    The So Make It web team
-				    </p>
-				    </body>
-				    </html>
-			      """
+              <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN"
+              "http://www.w3.org/TR/1999/REC-html401-19991224/frameset.dtd">
+              <html>
+              <head>
+              </head>
+              <body>
+              <img src="https://members.somakeit.org.uk/img/header.png" alt="So Make It" />
+              <p>
+              <b>Hello #{user.fullname} (#{user.username})</b>,<br />
+              <br />
+              </p>
+              <p>
+              We are sorry to inform you that you application to join So Make It has been rejected.<br/>
+              The person who reviewed your application was #{req.session.fullname}, and they gave the following reasons:
+              </p>
+              <p>
+              ---<br />
+              #{req.body.message}<br />
+              ---<br />
+              </p>
+              <p>
+              Kind regards,
+              </p>
+              <p>
+              The So Make It web team
+              </p>
+              </body>
+              </html>
+              """
             }, (err, res) ->
               if err
                 response.render 'message', {title: "Error", text: "Error sending email: #{err}"}
@@ -170,64 +170,63 @@ module.exports = (app) -> self = new class
               bcc: "#{process.env.TRUSTEES_ADDRESS}"
               subject: "So Make It approval"
               text: """
-              Hello #{user.fullname} (#{user.username}),
+                Hello #{user.fullname} (#{user.username}),
 
                 We're happy to inform you that your application to join So Make It was approved by #{req.session.fullname} and you are now on our Register of Members!
 
-                Welcome aboard! 
-				
-				Why not say hi on IRC, put your project on our wiki, and come start making things!
+                Welcome aboard!
 
-				We can be found on IRC at irc.freenode.net #southackton and #somakeit
+                Why not say hi on IRC, put your project on our wiki, and come start making things!
 
-				Sign up for the wiki at
-				
-				https://wiki.somakeit.org.uk/index.php5?title=Special:UserLogin&type=signup
+                We can be found on IRC at irc.freenode.net #southackton and #somakeit
 
-				Our opening times can be found at 
+                Sign up for the wiki at
 
-https://wiki.somakeit.org.uk/wiki/Opening_Hours
+                https://wiki.somakeit.org.uk/index.php5?title=Special:UserLogin&type=signup
 
+                Our opening times can be found at
+
+                https://wiki.somakeit.org.uk/wiki/Opening_Hours
 
                 Kind regards,
 
                 The So Make It web team.
                 """
               html: """
-				<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" 
-				"http://www.w3.org/TR/1999/REC-html401-19991224/frameset.dtd">
-				<html>
-				<head>
-				</head>
-				<body>
-				<img src="https://members.somakeit.org.uk/img/header.png" alt="So Make It" />
-				<p>
-                <b>Hello #{user.fullname} (#{user.username})</b>,<br />
-				<br />
-                We're happy to inform you that your application to join So Make It was <b style="color:green">approved</b> by #{req.session.fullname} and you are now on our Register of Members!
-				</p>
+                <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN"
+                "http://www.w3.org/TR/1999/REC-html401-19991224/frameset.dtd">
+                <html>
+                <head>
+                </head>
+                <body>
+                <img src="https://members.somakeit.org.uk/img/header.png" alt="So Make It" />
                 <p>
-				Welcome aboard! 
-				</p>
-				<p>
-				Why not say hi on IRC, put your project on our wiki, and come start making things!<br />
-				We can be found on IRC at irc.freenode.net #southackton and #somakeit
-</p>
-<p>
-        Sign up for the wiki <a href="https://wiki.somakeit.org.uk/index.php5?title=Special:UserLogin&type=signup">here</a> to add your project, or just do some general updates (This is not yet integrated into the members area, but if you want to help out with that... <a href="https://github.com/so-make-it/members-area">go for it</a>)
-</p>
-<p>
-				Our opening times can be found <a href="https://wiki.somakeit.org.uk/wiki/Opening_Hours">on our wiki</a>
-</p>
-<p>
-<br />
+                <b>Hello #{user.fullname} (#{user.username})</b>,<br />
+                <br />
+                We're happy to inform you that your application to join So Make It was <b style="color:green">approved</b> by #{req.session.fullname} and you are now on our Register of Members!
+                </p>
+                <p>
+                Welcome aboard!
+                </p>
+                <p>
+                Why not say hi on IRC, put your project on our wiki, and come start making things!<br />
+                We can be found on IRC at irc.freenode.net #southackton and #somakeit
+                </p>
+                <p>
+                Sign up for the wiki <a href="https://wiki.somakeit.org.uk/index.php5?title=Special:UserLogin&type=signup">here</a> to add your project, or just do some general updates (This is not yet integrated into the members area, but if you want to help out with that... <a href="https://github.com/so-make-it/members-area">go for it</a>)
+                </p>
+                <p>
+                Our opening times can be found <a href="https://wiki.somakeit.org.uk/wiki/Opening_Hours">on our wiki</a>
+                </p>
+                <p>
+                <br />
                 Kind regards,
-				</p>
-				<p>
-				The So Make It web team
-				</p>
-				</body>
-				</html>
+                </p>
+                <p>
+                The So Make It web team
+                </p>
+                </body>
+                </html>
                 """
               }, (err, res) ->
                 if err
@@ -440,6 +439,25 @@ https://wiki.somakeit.org.uk/wiki/Opening_Hours
     else
       next()
 
+  exists: (req, res) ->
+    username = req.query.username ? ""
+    query = where:{username:username}
+    r = req.User.find(query)
+    r.error (err) ->
+      res.json 404, {error: "Username doesn't exist"}
+    r.success (user) ->
+      if !user
+        res.json 404, {error: "Username doesn't exist"}
+      else
+        res.json {exists: true}
+
+  me: (req, res) ->
+    req.User.findByPostBody req.body, (err, user) ->
+      if err or !user.isApproved()
+        res.send 404, {error: "Username or password do not match an existing approved account."}
+      else
+        res.json {id: user.id, username: user.username, email: user.email}
+
   auth: (req, response, next) ->
     response.locals.userId = null
     response.locals.loggedInUser = null
@@ -457,7 +475,7 @@ https://wiki.somakeit.org.uk/wiki/Opening_Hours
           return next()
       else
         return next()
-    if req.session.userId? or ['/register', '/verify', '/forgot', '/reapply'].indexOf(req.path) isnt -1
+    if req.session.userId? or ['/register', '/verify', '/forgot', '/reapply', '/me', '/exists', '/auth/facebook', '/auth/facebook/callback', '/auth/github', '/auth/github/callback', '/auth/twitter', '/auth/twitter/callback'].indexOf(req.path) isnt -1
       return loggedIn()
     render = (opts = {}) ->
       opts.err ?= null
@@ -466,47 +484,31 @@ https://wiki.somakeit.org.uk/wiki/Opening_Hours
       response.render 'login', opts
     if req.method is 'POST' and req.body.form is 'login' and req.body.email?
       # Check data
-      {email, password} = req.body
-      if email.match /@/
-        query = where:{email:email}
-      else
-        query = where:{username:email}
-      r = req.User.find(query)
-      r.error (err) ->
-        return render({data:req.body,err})
-      r.success (user) ->
-        if !user
-          return render {data:req.body,err:new Error()}
-        bcrypt.compare password, user.password, (err, res) ->
-          if err or !res
-            return render {data:req.body,err:new Error()}
-          else
-            data = {}
-            try
-              data = JSON.parse user.data
-            if user.approved? and user.approved.getFullYear() > 2012
-              req.session.userId = user.id
-              req.session.fullname = user.fullname
-              req.session.username = user.username
-              req.session.admin = user.admin
-              return loggedIn()
-            else if data?.rejected
-              req.body.form = 'reapply'
-              self.reapply(req, response, next)
-            else
-              subject = "Pending approval: account ##{user.id}"
-              response.render 'message',
-                title:"Awaiting approval"
-                html:
-                  """
-                  <p>
-                  Our trustees need to enter you onto our Register of Members
-                  before your account can be approved. If it's been more than 5
-                  days, please contact <a
-                  href="mailto:#{process.env.TRUSTEES_ADDRESS}?subject=#{encodeURIComponent
-                  subject}">#{process.env.TRUSTEES_ADDRESS}</a>.
-                  </p>
-                  """
+      req.User.findByPostBody req.body, (err, user) ->
+        return render({data:req.body,err}) if err?
+        if user.isApproved()
+          req.session.userId = user.id
+          req.session.fullname = user.fullname
+          req.session.username = user.username
+          req.session.admin = user.admin
+          return loggedIn()
+        else if user.isRejected()
+          req.body.form = 'reapply'
+          self.reapply(req, response, next)
+        else
+          subject = "Pending approval: account ##{user.id}"
+          response.render 'message',
+            title:"Awaiting approval"
+            html:
+              """
+              <p>
+              Our trustees need to enter you onto our Register of Members
+              before your account can be approved. If it's been more than 5
+              days, please contact <a
+              href="mailto:#{process.env.TRUSTEES_ADDRESS}?subject=#{encodeURIComponent
+              subject}">#{process.env.TRUSTEES_ADDRESS}</a>.
+              </p>
+              """
       return
     return render()
 
@@ -791,6 +793,20 @@ https://wiki.somakeit.org.uk/wiki/Opening_Hours
 
 
     render()
+
+  account: (req, res, next) ->
+    r = req.User.find
+      where:
+        id: req.session.userId
+      attributes: ['id', 'facebookId', 'githubId', 'twitterId']
+    r.error (err) ->
+      req.error "Error occurred listing users."
+      req.error err
+      response.render 'message', {title:"Error", text: "Unknown error occurred, please try again later."}
+    r.success (model) ->
+      res.render 'account',
+        account: model.toJSON()
+        title: 'Account'
 
   viewRegister: (req, response, next) ->
     return next() unless req.session.admin
