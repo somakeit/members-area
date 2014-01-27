@@ -213,7 +213,7 @@ module.exports = (app) -> self = new class
                 We can be found on IRC at <a href="http://webchat.freenode.net/?channels=somakeit">irc.freenode.net</a> in #somakeit
                 </p>
                 <p>
-                Set up your wiki profile <a href="https://wiki.somakeit.org.uk/index.php5?title=User:#{user.username}&action=formedit">here</a> to add your project, or just do some general updates. 
+                Set up your wiki profile <a href="https://wiki.somakeit.org.uk/index.php5?title=User:#{user.username}&action=formedit">here</a> (Sign in with the username and password you set up for the members area) to add your project, or just do some general updates. 
                 </p>
                 <p>
                 Our opening times can be found <a href="https://wiki.somakeit.org.uk/wiki/Opening_Hours">on our wiki</a>
