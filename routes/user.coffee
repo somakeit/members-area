@@ -172,7 +172,7 @@ module.exports = (app) -> self = new class
               text: """
                 Hello #{user.fullname} (#{user.username}),
 
-                We're happy to inform you that your application to join So Make It was approved by #{req.session.fullname} and you are now on our Register of Members!
+                We're happy to inform you that your application to join So Make It was approved by #{data.votes.length} trustees and you are now on our Register of Members!
 
                 Welcome aboard!
 
@@ -203,27 +203,31 @@ module.exports = (app) -> self = new class
                 <p>
                 <b>Hello #{user.fullname} (#{user.username})</b>,<br />
                 <br />
-                We're happy to inform you that your application to join So Make It was <b style="color:green">approved</b> by #{req.session.fullname} and you are now on our Register of Members!
+                We're happy to inform you that your application to join So Make It was <b style="color:green">approved</b> by #{data.votes.length} trustees and you are now on our Register of Members!
                 </p>
                 <p>
                 Welcome aboard!
                 </p>
                 <p>
                 Why not say hi on IRC, put your project on our wiki, and come start making things!<br />
-                We can be found on IRC at irc.freenode.net #southackton and #somakeit
+                We can be found on IRC at <a href="http://webchat.freenode.net/?channels=somakeit">irc.freenode.net</a> in #somakeit
                 </p>
                 <p>
-                Sign up for the wiki <a href="https://wiki.somakeit.org.uk/index.php5?title=Special:UserLogin&type=signup">here</a> to add your project, or just do some general updates (This is not yet integrated into the members area, but if you want to help out with that... <a href="https://github.com/so-make-it/members-area">go for it</a>)
+                Set up your wiki profile <a href="https://wiki.somakeit.org.uk/index.php5?title=User:#{user.username}&action=formedit">here</a> to add your project, or just do some general updates. 
                 </p>
                 <p>
                 Our opening times can be found <a href="https://wiki.somakeit.org.uk/wiki/Opening_Hours">on our wiki</a>
+                </p>
+                <p>
+                You can also set up membership payments with Go Cardless at <a href="https://members.somakeit.org.uk/subscription">the members area</a> (or just a standing order using the details found there)
                 </p>
                 <p>
                 <br />
                 Kind regards,
                 </p>
                 <p>
-                The So Make It web team
+                The So Make It web team<br />
+                <a href="https://twitter.com/MakeSoton">@MakeSoton</a>
                 </p>
                 </body>
                 </html>
