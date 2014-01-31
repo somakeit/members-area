@@ -13,7 +13,10 @@ have `npm` installed (you should - it's bundled with Node!). Then:
 `git clone git@github.com:so-make-it/members-area.git && cd members-area`
 
 ### Install the members-area dependencies
-`npm install`
+```
+npm install
+npm install nodemon coffee-script -g
+```
 
 ### Set up your environment
 We use environmental variables to configure the software, but instead
