@@ -757,6 +757,7 @@ module.exports = (app) -> self = new class
           }
           r.success (user) ->
             if user.id is 1
+              user.setDataKey 'validationCode'
               user.approved = new Date()
               user.admin = true
               r = user.save()
