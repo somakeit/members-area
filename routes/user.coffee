@@ -756,6 +756,15 @@ module.exports = (app) -> self = new class
             }
           }
           r.success (user) ->
+            if user.id is 1
+              user.approved = new Date()
+              user.admin = true
+              r = user.save()
+              r.success ->
+                response.render 'message', {title:"Admin Registered", text: "As you're the first member to register, we've made you an admin :)"}
+              r.error (err) ->
+                response.render 'message', {title: "ERROR", text: "We couldn't make you an admin?!"}
+              return
             # Send them the email
             verifyURL = "#{process.env.SERVER_ADDRESS}/verify?id=#{user.id}&validationCode=#{validationCode}"
             gmail.sendMail {
