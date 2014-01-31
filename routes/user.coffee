@@ -783,7 +783,7 @@ module.exports = (app) -> self = new class
           r.error (err) ->
             req.error "Error registering user:"
             req.error err
-            if err.code is 'ER_DUP_ENTRY'
+            if err.code is 'ER_DUP_ENTRY' or err.code is 'SQLITE_CONSTRAINT'
               if err.message.match /'email'/
                 err.email = true
                 err.email409 = true
