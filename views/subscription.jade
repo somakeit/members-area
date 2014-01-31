@@ -10,7 +10,7 @@ block content
       - paidUntil = loggedInUser.approved
     - var duration = Math.floor((new Date() - paidUntil)/(24*60*60*1000));
     - durationText = duration + (duration == 1 ? " day" : " days")
-    if !loggedInUser.paidUntil || loggedInUser.paidUntil.getFullYear() < 2013
+    if !loggedInUser.paidUntil || !(loggedInUser.paidUntil.getFullYear() >= 2013)
       p.text-error We have received no subscription payments from you yet (payments may take
         |  a couple of days to show up). Please set up a standing order to the details at the bottom of the page.
     else if duration > 14

@@ -13,7 +13,7 @@ block content
           - var duration = Math.floor((new Date() - paidUntil)/(24*60*60*1000));
           - durationText = duration + (duration == 1 ? " day" : " days")
           - var emailText = body.replace("{{NAME}}", user.fullname).replace("{{DURATION}}", durationText)
-          if !user.paidUntil || user.paidUntil.getFullYear() < 2013
+          if !user.paidUntil || !(user.paidUntil.getFullYear() >= 2013)
             if user.getData().gocardless && (new Date() - user.getData().gocardless.start_at) < (4*24*60*60*1000)
               small  (never paid, #{durationText} overdue, gocardless pending)
             else

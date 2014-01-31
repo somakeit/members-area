@@ -17,7 +17,7 @@ block content
     if admin
       hr
       h3 ADMIN STUFF
-      if !user.paidUntil || user.paidUntil.getFullYear() < 2013
+      if !user.paidUntil || !(user.paidUntil.getFullYear() >= 2013)
         - var paidUntil = user.paidUntil
         if user.approved > paidUntil
           - paidUntil = user.approved
