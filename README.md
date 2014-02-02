@@ -15,7 +15,7 @@ have `npm` installed (you should - it's bundled with Node!). Then:
 ### Install the members-area dependencies
 ```
 npm install
-npm install nodemon coffee-script -g
+npm install nodemon coffee-script mocha -g
 ```
 
 ### Set up your environment
