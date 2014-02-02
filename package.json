@@ -3,19 +3,18 @@
   "version": "0.3.0",
   "private": true,
   "scripts": {
-    "start": "node_modules/.bin/coffee -c -m .; node app.js",
-    "test": "mocha --compilers coffee:coffee-script --reporter nyan"
+    "start": "node_modules/.bin/coffee -m app.coffee",
+    "test": "node_modules/.bin/mocha"
   },
   "dependencies": {
     "express": "~3.1.0",
     "jade": "~0.28.2",
     "stylus": "~0.32.1",
-    "coffee-script": "~1.6.2",
     "sequelize": "~1.6.0",
     "nodemailer": "~0.3.43",
     "bcrypt": "~0.7.5",
     "nib": "~0.9.1",
-    "source-map-support": "~0.1.2",
+    "source-map-support": "~0.1.9",
     "winston": "~0.6.2",
     "gocardless": "~0.1.0",
     "date-utils": "~1.2.12",
@@ -27,13 +26,14 @@
     "passport-github": "~0.1.5",
     "passport-local": "~0.1.6",
     "passport-facebook": "~0.1.5",
-    "passport-twitter": "~0.1.5"
+    "passport-twitter": "~0.1.5",
+    "coffee-script": "~1.7.1"
   },
   "devDependencies": {
     "sqlite3": "~2.1.5",
     "nodemon": "~0.7.5",
-    "mocha": "~1.9.0",
-    "chai": "~1.6.0"
+    "mocha": "~1.17.1",
+    "chai": "~1.9.0"
   },
   "engines": {
     "node": "0.8.x",
