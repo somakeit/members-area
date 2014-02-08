@@ -336,6 +336,43 @@ module.exports = (app) -> self = new class
           req.error "Failed to create payment"
           req.error err
           response.render 'message', {title: "Error", text: "Failed to create payment"}
+      else if req.method is 'POST' and req.session.admin and req.body.form is 'addcard'
+        {cardid} = req.body
+        if cardid
+          data = {}
+          try
+            data = JSON.parse user.data
+          data.cards ?= []
+          data.cards.push cardid
+          user.data = JSON.stringify data
+          r = user.save()
+          r.success ->
+            render()
+          r.error (err) ->
+            response.render 'message', {title: "Error", text: "Failed to save user #{user.id} to the DB."}
+        else
+          response.render 'message', {title: "Error", text: "No 'cardid'"}
+      else if req.method is 'POST' and req.session.admin and req.body.form is 'rmcard'
+        {cardid} = req.body
+        if cardid
+          data = {}
+          try
+            data = JSON.parse user.data
+          data.cards ?= []
+          console.log(cardid,data.cards)
+          index = data.cards.indexOf(cardid)
+          if index > -1
+            data.cards.splice(index,1)
+          console.log(cardid,data.cards)
+          user.data = JSON.stringify data
+          console.log(user.data)
+          r = user.save()
+          r.success ->
+            render()
+          r.error (err) ->
+            response.render 'message', {title: "Error", text: "Failed to save user #{user.id} to the DB."}
+        else
+          response.render 'message', {title: "Error", text: "No 'cardid'"}
       else
         render()
 

@@ -17,6 +17,25 @@ block content
     if admin
       hr
       h3 ADMIN STUFF
+      h4 RFID cards
+      table.table.table-striped
+        if user.data.cards
+          for card in user.data.cards
+            tr
+              td
+                form(method='POST')
+                  = card  
+                  &nbsp;
+                  input(type='hidden', name='form', value='rmcard')
+                  input(type='hidden', name='cardid', value=card)
+                  //TODO: make button smaller
+                  button.btn.btn-warning(type='submit') X
+        tr
+          td 
+            form(method='POST')
+              input(name='cardid')
+              input(type='hidden', name='form', value='addcard')
+              button.btn.btn-warning(type='submit') Add new card id
       if !user.paidUntil || !(user.paidUntil.getFullYear() >= 2013)
         - var paidUntil = user.paidUntil
         if user.approved > paidUntil
