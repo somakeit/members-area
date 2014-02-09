@@ -20,13 +20,14 @@ npm install nodemon coffee-script mocha -g
 
 ### Set up your environment
 We use environmental variables to configure the software, but instead
-you can create a `.env` file with `key=value` pairs. No comments, no
-quotes, no nothing. Parsing is done by `env.coffee` if you want to
+you can create a `.env` file with `key=value` pairs, no
+quotes. Comments are a leading #. Parsing is done by `env.coffee` if you want to
 improve it.
 
 Here's an example `.env` file:
 
 ```
+# force sqlite instead of mysql
 SQLITE=1
 SECRET=whateveryouwanthereitsnotimportant
 EMAIL_USERNAME=yours@gmail.com
