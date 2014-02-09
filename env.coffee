@@ -8,7 +8,6 @@ try
   for line in envContents.split /\n/ when matches = line.match /^([^=]+)=(.*)$/
     if ! matches[1].match /^\s*#/
       process.env[matches[1]] ?= matches[2]
-      console.log(matches[1])
 
 requiredEnvironmentalVars = [
   'REQUIRED_VOTES'
