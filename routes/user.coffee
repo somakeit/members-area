@@ -516,7 +516,7 @@ module.exports = (app) -> self = new class
           return next()
       else
         return next()
-    if req.session.userId? or ['/register', '/verify', '/forgot', '/reapply', '/me', '/exists', '/auth/facebook', '/auth/facebook/callback', '/auth/github', '/auth/github/callback', '/auth/twitter', '/auth/twitter/callback'].indexOf(req.path) isnt -1
+    if req.session.userId? or ['/register', '/verify', '/forgot', '/reapply', '/me', '/exists', '/auth/facebook', '/auth/facebook/callback', '/auth/github', '/auth/github/callback', '/auth/twitter', '/auth/twitter/callback','/adminapi/cards'].indexOf(req.path) isnt -1
       return loggedIn()
     render = (opts = {}) ->
       opts.err ?= null

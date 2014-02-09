@@ -32,6 +32,7 @@ dashboard = require('./routes/dashboard')(app)
 subscription = require('./routes/subscription')(app)
 admin = require('./routes/admin')(app)
 auth = require './routes/auth'
+adminapi = require('./routes/adminapi')(app)
 
 stylusCompile = (str, path) ->
   return stylus(str)
@@ -171,6 +172,9 @@ app.all '/viewRegister', user.viewRegister
 app.all '/admin/money', admin.money
 app.all '/admin/reminders', admin.reminders
 app.all '/admin/emails', admin.emails
+
+# restricted API-like
+app.get '/adminapi/cards', adminapi.cards
 
 handle501 = (req, res) ->
   res.statusCode = 501
