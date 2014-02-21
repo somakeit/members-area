@@ -359,13 +359,10 @@ module.exports = (app) -> self = new class
           try
             data = JSON.parse user.data
           data.cards ?= []
-          console.log(cardid,data.cards)
           index = data.cards.indexOf(cardid)
           if index > -1
             data.cards.splice(index,1)
-          console.log(cardid,data.cards)
           user.data = JSON.stringify data
-          console.log(user.data)
           r = user.save()
           r.success ->
             render()
@@ -516,7 +513,7 @@ module.exports = (app) -> self = new class
           return next()
       else
         return next()
-    if req.session.userId? or ['/register', '/verify', '/forgot', '/reapply', '/me', '/exists', '/auth/facebook', '/auth/facebook/callback', '/auth/github', '/auth/github/callback', '/auth/twitter', '/auth/twitter/callback','/adminapi/cards'].indexOf(req.path) isnt -1
+    if req.session.userId? or ['/register', '/verify', '/forgot', '/reapply', '/me', '/exists', '/auth/facebook', '/auth/facebook/callback', '/auth/github', '/auth/github/callback', '/auth/twitter', '/auth/twitter/callback', '/adminapi/cards'].indexOf(req.path) isnt -1
       return loggedIn()
     render = (opts = {}) ->
       opts.err ?= null
