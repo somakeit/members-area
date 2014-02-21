@@ -20,3 +20,11 @@ block content
     p.text-success You're paid up until 
       strong= loggedInUser.paidUntil.toString()
       |  - thanks!
+  h4 RFID
+  if loggedInUser.getData().cards
+    if loggedInUser.getData().cards.length == 1
+      p #{loggedInUser.getData().cards.length} card registered for access
+    else
+      p #{loggedInUser.getData().cards.length} cards registered for access
+  else
+    p no cards registered, please contact a trustee
