@@ -6,7 +6,8 @@ winston = require 'winston'
 try
   envContents = fs.readFileSync path.join(__dirname, '.env'), 'utf8'
   for line in envContents.split /\n/ when matches = line.match /^([^=]+)=(.*)$/
-    process.env[matches[1]] ?= matches[2]
+    if ! matches[1].match /^\s*#/
+      process.env[matches[1]] ?= matches[2]
 
 requiredEnvironmentalVars = [
   'REQUIRED_VOTES'
