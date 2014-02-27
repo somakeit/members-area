@@ -30,6 +30,7 @@ Here's an example `.env` file:
 # force sqlite instead of mysql
 SQLITE=1
 SECRET=whateveryouwanthereitsnotimportant
+CARD_SECRET=whateveryouwanthereitsnotimportant
 EMAIL_USERNAME=yours@gmail.com
 EMAIL_PASSWORD=yourpassword
 APPROVAL_TEAM_EMAIL=yours+approval@gmail.com
