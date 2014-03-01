@@ -1,9 +1,9 @@
 {
   "name": "members-area",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "private": true,
   "scripts": {
-    "start": "node_modules/.bin/coffee -m app.coffee",
+    "start": "node_modules/.bin/coffee app.coffee",
     "test": "node_modules/.bin/mocha"
   },
   "dependencies": {
