@@ -1,3 +1,17 @@
+New Version In Progress
+=======================
+
+There's a ground up rewrite of this Members Area in progress with many
+more features, a plugin and theme architecture, roles and permissions
+and much much more. The aim for the new Members Area is to be much
+easier for other Makerspaces/Hackerspaces to customize and use for
+their own purposes (not to mention making it easier to expand for So
+Make It's usage).
+
+The new version is temporarily located
+[here](https://github.com/benjie/members-area) (it already has more
+commits than this one!)
+
 members-area
 ============
 
